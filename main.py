@@ -16,7 +16,7 @@ try:
     ]
     )
 except Exception as e:
-    print(e)
+    print(f'Failed: \n{e}')
     exit()
 
 print(completion.choices[0].message)
