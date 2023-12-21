@@ -1,7 +1,7 @@
-def loadEnv(default=".env"):
+def loadEnv(file=".env"):
     # Load environment variables as a dictionary
     env = {}
-    with open(f"{default}", "r") as f:
+    with open(f"{file}", "r") as f:
         for line in f:
             if line[0] != '#':
                 key, value = line.strip().split('=')
