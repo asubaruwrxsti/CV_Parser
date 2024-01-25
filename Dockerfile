@@ -46,4 +46,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD gunicorn 'env.lib.python3.11.site-packages.fastapi.middleware.wsgi' --bind=0.0.0.0:8000
+CMD ["python", "run.py"]

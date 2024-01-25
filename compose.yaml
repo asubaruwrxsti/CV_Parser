@@ -1,7 +1,12 @@
 services:
   app:
+    container_name: cv-app
+    restart: always
+    image: build
     build:
       context: .
+      dockerfile: Dockerfile
+    user: appuser
     volumes:
       - .:/app
     ports:
@@ -11,11 +16,11 @@ services:
         condition: service_healthy
 
   db:
+    container_name: cv-db
     image: postgres
     restart: always
-    user: postgres
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=cv_database
       - POSTGRES_USER=postgres
@@ -26,7 +31,3 @@ services:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
       timeout: 5s
-      retries: 5
-volumes:
-  db-data:
-
