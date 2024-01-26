@@ -34,6 +34,8 @@ class Database:
 
     def create_schema(self):
         self.query("CREATE TABLE IF NOT EXISTS visits (id SERIAL PRIMARY KEY, user_agent TEXT, ip TEXT);")
+        # Schema for the cv-db
+        # ... add more tables here if needed
 
     def commit(self):
         self.connection.commit()
