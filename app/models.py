@@ -51,6 +51,7 @@ class Visit(TableRecord):
     fields: dict = {'user_agent': None, 'ip': None}
 
     def __init__(self, **data):
+        # TODO: Create the table if it doesn't exist
         super().__init__(**data)
 
     def define_fields(self):
