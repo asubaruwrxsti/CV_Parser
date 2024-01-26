@@ -1,9 +1,10 @@
 from app.db import Database
 
-database = None
+class DatabaseSingleton:
+    _instance = None
 
-def get_database():
-    global database
-    if database is None:
-        database = Database()
-    yield database
+    @staticmethod
+    def get_instance():
+        if DatabaseSingleton._instance is None:
+            DatabaseSingleton._instance = Database()
+        return DatabaseSingleton._instance
