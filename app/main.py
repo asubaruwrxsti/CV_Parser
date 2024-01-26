@@ -14,8 +14,8 @@ for _, module_name, _ in pkgutil.iter_modules(package.__path__):
 
     # Check if the module has a 'router' attribute
     if hasattr(module, 'router'):
-        # Include the router in the FastAPI app
-        app.include_router(module.router)
+        # Include the router in the FastAPI app with a prefix
+        app.include_router(module.router, prefix=f'/{module_name}')
 
 @app.get("/")
 async def read_root(request: Request, db: Database = Depends(get_db)):
