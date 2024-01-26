@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, Request
 import pkgutil
 import importlib
-from app.dependencies import DatabaseSingleton
+from app.dependencies import get_db, Database
 
 app = FastAPI()
 
@@ -18,15 +18,17 @@ for _, module_name, _ in pkgutil.iter_modules(package.__path__):
         app.include_router(module.router)
 
 @app.get("/")
-async def read_root(request: Request, db: DatabaseSingleton = Depends(DatabaseSingleton.get_instance)):
-    with db.connection.cursor() as cursor:
-        cursor.execute("INSERT INTO visits (user_agent, ip) VALUES (%s, %s)", (request.headers['user-agent'], request.client.host))
-        cursor.execute("SELECT COUNT(*) FROM visits;")
-        visits = cursor.fetchone()[0]
+async def read_root(request: Request, db: Database = Depends(get_db)):
+    try:
+        db.query(
+            "INSERT INTO visits (user_agent, ip) VALUES (%s, %s)",
+            (request.headers['user-agent'], request.client.host)
+        )
         db.commit()
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        visit_count = db.query("SELECT COUNT(*) FROM visits")[0][0]
 
-    return {"Hello": "World", "Visits": visits}
+    return {"Hello": "World", "visit_count": visit_count}
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}

@@ -34,6 +34,7 @@ services:
       - db_data:/var/lib/postgresql/data
 
   adminer:
+    container_name: cv-adminer
     image: adminer
     restart: always
     ports:

@@ -1,10 +1,13 @@
-from app.db import Database
+from .db import Database
 
-class DatabaseSingleton:
-    _instance = None
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
-    @staticmethod
-    def get_instance():
-        if DatabaseSingleton._instance is None:
-            DatabaseSingleton._instance = Database()
-        return DatabaseSingleton._instance
+Database = Singleton('Database', (Database,), {})
+
+def get_db():
+    return Database()

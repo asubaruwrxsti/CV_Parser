@@ -28,7 +28,7 @@ class Database:
                 except ProgrammingError:
                     return None
 
-    def __del__(self):
+    def close(self):
         self.cursor.close()
         self.connection.close()
 
