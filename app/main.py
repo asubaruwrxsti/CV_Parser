@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Request
 import pkgutil
 import importlib
 from app.dependencies import get_db, Database
+from app.models import Visit
 
 app = FastAPI()
 
@@ -19,16 +20,9 @@ for _, module_name, _ in pkgutil.iter_modules(package.__path__):
 
 @app.get("/")
 async def read_root(request: Request, db: Database = Depends(get_db)):
-    try:
-        db.query(
-            "INSERT INTO visits (user_agent, ip) VALUES (%s, %s)",
-            (request.headers['user-agent'], request.client.host)
-        )
-        db.commit()
-    except Exception as e:
-        return {"error": str(e)}
-    finally:
-        visit_count = db.query("SELECT COUNT(*) FROM visits")[0][0]
+    visit = Visit(user_agent=request.headers['user-agent'], ip=request.client.host)
+    await visit.create_record(db)
 
-    return {"Hello": "World", "visit_count": visit_count}
+    visit_count = await visit.get_records(db)
+    return {"Hello": "World", "visit_count": len(visit_count) if visit_count else 0}
 
