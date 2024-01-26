@@ -17,12 +17,13 @@ for _, module_name, _ in pkgutil.iter_modules(package.__path__):
         # Include the router in the FastAPI app
         app.include_router(module.router)
 
-# Define main routes
 @app.get("/")
 async def read_root(request: Request, db = Depends(get_database)):
-    db.query("CREATE TABLE IF NOT EXISTS visits (id serial PRIMARY KEY, user_agent VARCHAR(255), ip VARCHAR(255), visited_at TIMESTAMP DEFAULT NOW()); SELECT COUNT(*) FROM visits;")[0][0]
-    db.query("INSERT INTO visits (user_agent, ip) VALUES (%s, %s)", (request.headers['user-agent'], request.client.host))
-    visits = db.query("SELECT COUNT(*) FROM visits;")[0][0]
+    with db.connection.cursor() as cursor:
+        cursor.execute("INSERT INTO visits (user_agent, ip) VALUES (%s, %s)", (request.headers['user-agent'], request.client.host))
+        cursor.execute("SELECT COUNT(*) FROM visits;")
+        visits = cursor.fetchone()[0]
+        db.commit()
 
     return {"Hello": "World", "Visits": visits}
 

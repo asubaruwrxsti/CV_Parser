@@ -19,15 +19,25 @@ services:
     container_name: cv-db
     image: postgres
     restart: always
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=cv_database
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
       timeout: 5s
+    command: ["postgres", "-c", "listen_addresses=*", "-c", "max_connections=200"] # Adjust configuration if needed
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  db_data:

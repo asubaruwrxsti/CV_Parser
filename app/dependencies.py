@@ -1,6 +1,9 @@
 from app.db import Database
 
+database = None
+
 def get_database():
-    database = Database()
+    global database
+    if database is None:
+        database = Database()
     yield database
-    del database
