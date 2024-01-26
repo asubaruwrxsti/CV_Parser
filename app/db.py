@@ -9,6 +9,7 @@ class Database:
 
     def connect(self):
         try:
+            # TODO: Change the connection string to use the environment variable
             return psycopg2.connect(
                 host="db",
                 database="cv_database",

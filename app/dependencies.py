@@ -1,4 +1,4 @@
-from .db import Database
+from .db import Database as BaseDatabase
 
 class Singleton(type):
     _instances = {}
@@ -7,7 +7,8 @@ class Singleton(type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-Database = Singleton('Database', (Database,), {})
+class Database(BaseDatabase, metaclass=Singleton):
+    pass
 
 def get_db():
     return Database()
