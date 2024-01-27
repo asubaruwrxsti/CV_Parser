@@ -18,6 +18,7 @@ for _, module_name, _ in pkgutil.iter_modules(package.__path__):
         # Include the router in the FastAPI app with a prefix
         app.include_router(module.router, prefix=f'/{module_name}')
 
+# Test route
 @app.get("/")
 async def read_root(request: Request, db: Database = Depends(get_db)):
     visit = Visit(user_agent=request.headers['user-agent'], ip=request.client.host)

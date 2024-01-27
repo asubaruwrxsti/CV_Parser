@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 from app.dependencies import Database
 from psycopg2 import sql, errors
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class TableRecord(BaseModel, ABC):
     table_name: str
@@ -12,46 +12,38 @@ class TableRecord(BaseModel, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.field_types = self.define_field_types()
-        self.fields = self.define_fields()
         self._create_table(Database())
 
-    def define_fields(self) -> Dict[str, str]:
-        return {k: v for k, v in self.__dict__.items() if k in self.field_types and v is not None}
-
-    @abstractmethod
-    def define_field_types(self) -> Dict[str, str]:
-        pass
-
     async def create_record(self, db: Database):
-        await self._execute_query(db, "INSERT INTO {} ({}) VALUES ({})", self.fields)
+        await self._create_query(db, "INSERT INTO {} ({}) VALUES ({})", self.fields)
 
     async def get_records(self, db: Database, record_id: Optional[int] = None):
         if record_id is not None:
-            records = await self._execute_query(db, "SELECT * FROM {} WHERE id = %s", {'id': record_id})
+            records = await self._create_query(db, "SELECT * FROM {} WHERE id = %s", {'id': record_id})
         else:
-            records = await self._execute_query(db, "SELECT * FROM {}", {})
+            records = await self._create_query(db, "SELECT * FROM {}", {})
         return records
     
     async def update_record(self, db: Database, record_id: int, fields: Dict[str, str]):
-        fields['id'] = record_id
-        await self._execute_query(db, "UPDATE {} SET {} WHERE id = %s", fields)
+        set_clause = ', '.join(f'{field} = %s' for field in fields.keys())
+        query = f"UPDATE {self.table_name} SET {set_clause} WHERE id = %s"
+        fields['id'] = record_id  # move this line here
+        await self._create_query(db, query, fields)
     
     async def delete_record(self, db: Database, record_id: int):
-        await self._execute_query(db, "DELETE FROM {} WHERE id = %s", {'id': record_id})
+        await self._create_query(db, "DELETE FROM {} WHERE id = %s", {'id': record_id})
 
-    async def _execute_query(self, db: Database, query_template: str, fields: Dict[str, str]):
+    async def _create_query(self, db: Database, query_template: str, fields: Dict[str, str]):
         placeholders = sql.SQL(', ').join(sql.Placeholder() * len(fields))
         query = sql.SQL(query_template).format(
             sql.Identifier(self.table_name),
             sql.SQL(', ').join(map(sql.Identifier, fields.keys())),
             placeholders
         )
-        query = await self._create_query(db, query, tuple(fields.values()))
-        print(query)
+        query = await self._execute_query(db, query, tuple(fields.values()))
         return query
 
-    async def _create_query(self, db: Database, query: str, values: tuple):
+    async def _execute_query(self, db: Database, query: str, values: tuple):
         try:
             result = db.query(query, values)
             db.commit()
