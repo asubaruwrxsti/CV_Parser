@@ -1,5 +1,8 @@
 import psycopg2
 from psycopg2 import OperationalError, ProgrammingError
+from app.utils.helperFunctions import loadEnv
+
+env = loadEnv()
 
 class Database:
     def __init__(self):
@@ -8,12 +11,11 @@ class Database:
 
     def connect(self):
         try:
-            # TODO: Change the connection string to use the environment variable
             return psycopg2.connect(
-                host="db",
-                database="cv_database",
-                user="postgres",
-                password="example"
+                host = env['DB_HOST'],
+                database = env['DB_NAME'],
+                user = env['DB_USER'],
+                password = env['DB_PASSWORD']
             )
         except OperationalError as e:
             print(f"The error '{e}' occurred")

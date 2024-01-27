@@ -9,7 +9,7 @@ def loadEnv(file=".env"):
     env = {}
     with open(f"{file}", "r") as f:
         for line in f:
-            if line[0] != '#':
+            if line[0] != '#' and '=' in line:
                 key, value = line.strip().split('=')
                 env[key] = value
     return env
