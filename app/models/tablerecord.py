@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 class TableRecord(BaseModel, ABC):
     table_name: str
     fields: Dict[str, str]
+    field_types: Dict[str, str]
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -15,9 +16,8 @@ class TableRecord(BaseModel, ABC):
         self.field_types = self.define_field_types()
         self._create_table(Database())
 
-    @abstractmethod
     def define_fields(self) -> Dict[str, str]:
-        pass
+        return {k: v for k, v in self.__dict__.items() if k in self.field_types and v is not None}
 
     @abstractmethod
     def define_field_types(self) -> Dict[str, str]:
@@ -48,6 +48,7 @@ class TableRecord(BaseModel, ABC):
             placeholders
         )
         query = await self._create_query(db, query, tuple(fields.values()))
+        print(query)
         return query
 
     async def _create_query(self, db: Database, query: str, values: tuple):
