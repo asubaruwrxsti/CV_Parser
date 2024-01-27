@@ -12,8 +12,8 @@ class TableRecord(BaseModel, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.fields = self.define_fields()
         self.field_types = self.define_field_types()
+        self.fields = self.define_fields()
         self._create_table(Database())
 
     def define_fields(self) -> Dict[str, str]:
