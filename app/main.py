@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, Request
 import pkgutil
 import importlib
 from app.dependencies import get_db, Database
-from app.models import Visit
+from app.models.models import Visit
 
 app = FastAPI()
 

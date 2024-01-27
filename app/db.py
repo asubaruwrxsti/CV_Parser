@@ -5,7 +5,6 @@ class Database:
     def __init__(self):
         self.connection = self.connect()
         self.cursor = self.connection.cursor()
-        self.create_schema()
 
     def connect(self):
         try:
@@ -32,10 +31,6 @@ class Database:
     def close(self):
         self.cursor.close()
         self.connection.close()
-
-    def create_schema(self):
-        self.query("CREATE TABLE IF NOT EXISTS visits (id SERIAL PRIMARY KEY, user_agent TEXT, ip TEXT);")
-        # Use service.py to create the tables
 
     def commit(self):
         self.connection.commit()
