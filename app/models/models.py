@@ -17,7 +17,7 @@ class Visit(TableRecord):
         self.fields['user_agent'] = user_agent
         self.fields['ip'] = ip
 
-class User(TableRecord):
+class Users(TableRecord):
     table_name: str = 'users'
     fields: Dict[str, str] = {
         'username': None,
@@ -58,3 +58,56 @@ class Project(TableRecord):
         self.fields['participants'] = participants
         self.fields['status'] = status
 
+class CV(TableRecord):
+    table_name: str = 'cv'
+    fields: Dict[str, str] = {
+        'name': None,
+        'phone': None,
+        'email': None,
+        'personal_description': None, # JSON
+        'previous_experiences': None, # JSON
+        'education': None, # JSON
+        'skills': None, # JSON
+    }
+
+    field_types: Dict[str, str] = {
+        'name': 'VARCHAR(255)',
+        'phone': 'VARCHAR(255)',
+        'email': 'VARCHAR(255)',
+        'personal_description': 'VARCHAR(255)',
+        'previous_experiences': 'VARCHAR(255)',
+        'education': 'VARCHAR(255)',
+        'skills': 'VARCHAR(255)',
+    }
+
+    def __init__(self, name: str = None, phone: str = None, email: str = None, personal_description: str = None, previous_experiences: str = None, education: str = None, skills: str = None, **data):
+        super().__init__(**data)
+        self.fields['name'] = name
+        self.fields['phone'] = phone
+        self.fields['email'] = email
+        self.fields['personal_description'] = personal_description
+        self.fields['previous_experiences'] = previous_experiences
+        self.fields['education'] = education
+        self.fields['skills'] = skills
+
+class Candidate(TableRecord):
+    table_name: str = 'candidates'
+    fields: Dict[str, str] = {
+        'name': None,
+        'cv_id': None,
+        'status': None,
+        'project_id': None
+    }
+    field_types: Dict[str, str] = {
+        'name': 'VARCHAR(255)',
+        'cv_id': 'VARCHAR(255)',
+        'status': 'VARCHAR(255)',
+        'project_id': 'VARCHAR(255)'
+    }
+
+    def __init__(self, name: str = None, cv_id: str = None, status: str = None, project_id: str = None, **data):
+        super().__init__(**data)
+        self.fields['name'] = name
+        self.fields['cv_id'] = cv_id
+        self.fields['status'] = status
+        self.fields['project_id'] = project_id

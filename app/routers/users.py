@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Request
-from app.models.models import User
+from app.models.models import Users
 from app.dependencies import Database
 import hashlib
 
 router = APIRouter()
 
-user = User()
+user = Users()
 
 @router.get("/")
 async def read():    
@@ -20,7 +20,7 @@ async def create(request: Request):
     try:
         form_data = await request.form()
         hashed_password = hashlib.sha256(form_data['password'].encode()).hexdigest()
-        user = User(username=form_data['username'], password=hashed_password)
+        user = Users(username=form_data['username'], password=hashed_password)
         await user.create_record(Database())
         return {"Create": "User"}
     except Exception as e:

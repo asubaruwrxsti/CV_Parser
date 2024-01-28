@@ -39,6 +39,14 @@ services:
     restart: always
     ports:
       - 8080:8080
+  
+  frontend-app:
+    container_name: cv-frontend
+    restart: always
+    image: node:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
 
 volumes:
   db_data:
