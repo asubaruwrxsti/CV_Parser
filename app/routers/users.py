@@ -20,7 +20,12 @@ async def create(request: Request):
     try:
         form_data = await request.form()
         hashed_password = hashlib.sha256(form_data['password'].encode()).hexdigest()
-        user = Users(username=form_data['username'], password=hashed_password)
+        user = Users(
+            username = form_data['username'],
+            password = hashed_password, 
+            projects = form_data.get('projects', None), 
+            group_id = form_data.get('group_id', None)
+        )
         await user.create_record(Database())
         return {"Create": "User"}
     except Exception as e:

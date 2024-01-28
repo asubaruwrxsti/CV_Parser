@@ -21,25 +21,66 @@ class Users(TableRecord):
     table_name: str = 'users'
     fields: Dict[str, str] = {
         'username': None,
-        'password': None
+        'password': None,
+        'projects': None,
+        'group_id': None,
     }
     field_types: Dict[str, str] = {
         'username': 'VARCHAR(255)',
-        'password': 'VARCHAR(255)'
+        'password': 'VARCHAR(255)',
+        'projects': 'VARCHAR(255)',
+        'group_id': 'VARCHAR(255)',
     }
 
-    def __init__(self, username: str = None, password: str = None, **data):
+    def __init__(self, username: str = None, password: str = None, projects: str = None, group_id: str = None, **data):
         super().__init__(**data)
         self.fields['username'] = username
         self.fields['password'] = password
+        self.fields['projects'] = projects
+        self.fields['group_id'] = group_id
+
+class Group(TableRecord):
+    table_name: str = 'groups'
+    fields: Dict[str, str] = {
+        'name': None,
+        'users': None # JSON
+    }
+    field_types: Dict[str, str] = {
+        'name': 'VARCHAR(255)',
+        'users': 'VARCHAR(255)'
+    }
+
+    def __init__(self, name: str = None, users: str = None, **data):
+        super().__init__(**data)
+        self.fields['name'] = name
+        self.fields['users'] = users
+
+class Permissions(TableRecord):
+    table_name: str = 'permissions'
+    fields: Dict[str, str] = {
+        'name': None,
+        'group_id': None, # id
+        'permissions': None # JSON
+    }
+    field_types: Dict[str, str] = {
+        'name': 'VARCHAR(255)',
+        'group_id': 'VARCHAR(255)',
+        'permissions': 'VARCHAR(255)'
+    }
+
+    def __init__(self, name: str = None, group_id: str = None, permissions: str = None, **data):
+        super().__init__(**data)
+        self.fields['name'] = name
+        self.fields['group_id'] = group_id
+        self.fields['permissions'] = permissions
 
 class Project(TableRecord):
     table_name: str = 'projects'
     fields: Dict[str, str] = {
         'name': None,
         'description': None,
-        'leader': None,
-        'participants': None,
+        'leader': None, # id
+        'participants': None, # JSON
         'status': None
     }
     field_types: Dict[str, str] = {

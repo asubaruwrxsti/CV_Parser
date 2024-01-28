@@ -59,7 +59,7 @@ class TableRecord(BaseModel, ABC):
         query = sql.SQL("CREATE TABLE IF NOT EXISTS {} (id SERIAL PRIMARY KEY, {})").format(
             sql.Identifier(self.table_name),
             sql.SQL(', ').join(
-                sql.SQL('{} {}').format(sql.Identifier(key), sql.SQL(self.field_types[key]))
+                sql.SQL('{} {} DEFAULT NULL').format(sql.Identifier(key), sql.SQL(self.field_types[key]))
                 for key in self.field_types.keys()
             )
         )
