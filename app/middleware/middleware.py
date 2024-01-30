@@ -6,8 +6,8 @@ from app.utils.helperFunctions import loadEnv
 
 env = loadEnv()
 
-SECRET_KEY = env.str("JWT_SECRET")
-ALGORITHM = env.str("JWT_ALGORITHM")
+SECRET_KEY = env["JWT_SECRET"]
+ALGORITHM = env["JWT_ALGORITHM"]
 
 class checkJWT(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
