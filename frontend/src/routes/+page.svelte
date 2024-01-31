@@ -1,6 +1,7 @@
 <script>
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import "../app.css";
+	import welcome from "$lib/images/svelte-welcome.webp";
+	import welcome_fallback from "$lib/images/svelte-welcome.png";
 </script>
 
 <svelte:head>
@@ -19,6 +20,8 @@
 
 		to your new<br />SvelteKit app
 	</h1>
+
+	<h1 class="text-3xl font-bold underline">Hello world!</h1>
 </section>
 
 <style>
