@@ -43,7 +43,6 @@ services:
   frontend-app:
     container_name: cv-frontend
     restart: always
-    image: node:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
