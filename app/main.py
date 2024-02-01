@@ -1,10 +1,24 @@
 from fastapi import FastAPI, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
 import pkgutil
 import importlib
 from app.dependencies import get_db, Database
 from app.models.models import Visit
 
 app = FastAPI()
+
+# Add CORS middleware
+origins = [
+    "*",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 package_name = 'app.routers'
 package = importlib.import_module(package_name)
@@ -26,4 +40,3 @@ async def read_root(request: Request, db: Database = Depends(get_db)):
 
     visit_count = await visit.get_records(db)
     return {"Hello": "World", "visit_count": len(visit_count) if visit_count else 0}
-
