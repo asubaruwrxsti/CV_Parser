@@ -2,12 +2,12 @@
     import { slide } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
 
-    let email = "";
+    let username = "";
     let password = "";
 
     function handleLogin() {
         let form = new FormData();
-        form.append("email", email);
+        form.append("username", username);
         form.append("password", password);
 
         let url = "http://localhost:8000/auth/login";
@@ -37,13 +37,13 @@
         <input type="hidden" name="remember" value="true" />
         <div class="rounded-md shadow-sm -space-y-px">
             <div class="mb-2">
-                <label for="email-address" class="sr-only">Email address</label>
+                <label for="userame" class="sr-only">Username</label>
                 <input
-                    bind:value={email}
-                    id="email-address"
-                    name="email"
+                    bind:value={username}
+                    id="username"
+                    name="username"
                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm hover:border-indigo-500 transition"
-                    placeholder="Email address"
+                    placeholder="Username"
                 />
             </div>
             <div>

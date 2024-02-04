@@ -22,7 +22,8 @@ async def create(request: Request):
         hashed_password = hashlib.sha256(form_data['password'].encode()).hexdigest()
         user = Users(
             username = form_data['username'],
-            password = hashed_password, 
+            password = hashed_password,
+            email = form_data.get('email', None),
             projects = form_data.get('projects', None), 
             group_id = form_data.get('group_id', None)
         )

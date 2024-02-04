@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, status, Request
-from app.dependencies import Database, SessionManager
+from fastapi import APIRouter, HTTPException, status, Request, Depends
+from app.dependencies import Database, SessionManager, CORS
 import hashlib
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(CORS)])
 session_manager = SessionManager()
 
 @router.post("/login")

@@ -22,20 +22,23 @@ class Users(TableRecord):
     fields: Dict[str, str] = {
         'username': None,
         'password': None,
+        'email': None,
         'projects': None,
         'group_id': None,
     }
     field_types: Dict[str, str] = {
         'username': 'VARCHAR(255)',
         'password': 'VARCHAR(255)',
+        'email': 'VARCHAR(255)',
         'projects': 'VARCHAR(255)',
         'group_id': 'VARCHAR(255)',
     }
 
-    def __init__(self, username: str = None, password: str = None, projects: str = None, group_id: str = None, **data):
+    def __init__(self, username: str = None, password: str = None, email: str = None, projects: str = None, group_id: str = None, **data):
         super().__init__(**data)
         self.fields['username'] = username
         self.fields['password'] = password
+        self.fields['email'] = email
         self.fields['projects'] = projects
         self.fields['group_id'] = group_id
 

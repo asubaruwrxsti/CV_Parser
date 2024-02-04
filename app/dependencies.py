@@ -1,5 +1,6 @@
 import uuid
 from .db import Database as BaseDatabase
+from fastapi import Request, Response
 
 class Singleton(type):
     _instances = {}
@@ -35,3 +36,8 @@ class SessionManager(metaclass=Singleton):
     
     def generate_session_id(self):
         return str(uuid.uuid4())
+
+async def CORS(request: Request, response: Response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,GET,POST'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
