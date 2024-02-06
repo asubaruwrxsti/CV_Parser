@@ -1,5 +1,6 @@
 <script>
 	import '../app.css';
+	import '../transition.css';
 </script>
 
 <div class="app">
