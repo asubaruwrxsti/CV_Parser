@@ -1,54 +1,46 @@
-<script>
-	import welcome from "$lib/images/svelte-welcome.webp";
-	import welcome_fallback from "$lib/images/svelte-welcome.png";
+<script lang="ts">
+	import { onMount } from "svelte";
+
+	let isLoading = true;
+
+	onMount(() => {
+		setTimeout(() => {
+			isLoading = false;
+		}, 1000);
+	});
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h1 class="text-3xl font-bold underline">Hello world!</h1>
-</section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+<div class="h-screen flex">
+	{#if isLoading}
+		<div
+			class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500 m-auto"
+		></div>
+	{:else}
+		<div class="flex flex-row h-full w-full">
+			<div class="h-full w-2/3">
+				<img
+					src="VIRNA-01.svg"
+					alt="Project Logo"
+					class="w-full h-full"
+				/>
+			</div>
+			<div
+				class="h-full w-1/3 bg-black text-white p-8 flex flex-col items-center justify-center"
+			>
+				<div class="mb-4">
+					<h2 class="text-4xl">Welcome</h2>
+				</div>
+				<div class="flex flex-row items-center justify-center w-full">
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-10 rounded text-xl mr-4 transform transition duration-500 ease-in-out"
+						>Login</button
+					>
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-10 rounded text-xl transform transition duration-500 ease-in-out"
+						>Signup</button
+					>
+				</div>
+			</div>
+		</div>
+	{/if}
+</div>
