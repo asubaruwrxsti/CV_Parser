@@ -1,6 +1,12 @@
-import uuid
 from .db import Database as BaseDatabase
 from fastapi import Request, Response
+from app.utils.helperFunctions import loadEnv
+import uuid
+import time
+import jwt
+import redis
+
+env = loadEnv()
 
 class Singleton(type):
     _instances = {}
@@ -18,26 +24,48 @@ def get_db():
 
 # SessionManager class
 class SessionManager(metaclass=Singleton):
-    def __init__(self):
-        self.sessions = {}
-
     def get_session(self, session_id):
         return self.sessions.get(session_id)
 
     def create_session(self, session_id, data):
-        self.sessions[session_id] = data
+        encoded_jwt = jwt.encode(
+            {
+                "session_id": session_id, 
+                "exp": time.time() + 3600
+            },
+            env["JWT_SECRET"],
+            algorithm=env["JWT_ALGORITHM"]
+        )
+        Redis().write_to_redis(session_id, (encoded_jwt, data))
+        return encoded_jwt
 
     def delete_session(self, session_id):
         if session_id in self.sessions:
             del self.sessions[session_id]
     
-    def get_current_user(self):
-        return self.sessions
-    
     def generate_session_id(self):
         return str(uuid.uuid4())
 
-async def CORS(request: Request, response: Response):
+def CORS(request: Request, response: Response):
+    # TODO: Apply the CORS policy from the environment
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
     response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,GET,POST'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+
+class Redis(metaclass=Singleton):
+    def __init__(self):
+        self.redis = redis.Redis(
+            host="redis",
+            port=6379
+        )
+    
+    def write_to_redis(self, key, value):
+        if isinstance(value, tuple):
+            value = str(value)
+        self.redis.set(key, value)
+    
+    def read_from_redis(self, key):
+        return self.redis.get(key)
+
+    def delete_from_redis(self, key):
+        self.redis.delete(key)

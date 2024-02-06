@@ -18,6 +18,11 @@
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
+                if (data.token) {
+                    localStorage.setItem("session", JSON.stringify(data["token"], data["session_id"]));
+                    console.log(localStorage.getItem("session"));
+                }
+
             })
             .catch((error) => {
                 console.log(error);

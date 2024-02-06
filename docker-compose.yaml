@@ -54,5 +54,15 @@ services:
     depends_on:
       - backend-app
 
+  redis:
+    container_name: cv-redis
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
 volumes:
   db_data:
+  redis_data:
