@@ -9,7 +9,7 @@
         const swup = new Swup();
 
         // TODO: Check if session exists, and has not expired
-        if (localStorage.getItem("session")) {
+        if (!localStorage.getItem("session")) {
             window.location.href = "/dashboard";
         }
 
@@ -28,6 +28,6 @@
             class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"
         ></div>
     {:else}
-        <LoginForm />
+        DASHBOARDDDDDDDD
     {/if}
 </div>

@@ -14,6 +14,11 @@
 			containers: ["#swup"],
 		});
 
+		// TODO: Check if session exists, and has not expired
+		if (localStorage.getItem("session")) {
+			window.location.href = "/dashboard";
+		}
+
 		setTimeout(() => {
 			isLoading = false;
 		}, 500);
@@ -42,6 +47,12 @@
 			>
 				{#if showLogin}
 					<LoginForm />
+					<button
+						class="text-blue-500 hover:text-blue-700 mt-4"
+						on:click={() => (showLogin = false)}
+					>
+						Back
+					</button>
 					<!-- Render LoginForm when showLogin is true -->
 				{:else}
 					<div in:fade={{ duration: 500 }}>
