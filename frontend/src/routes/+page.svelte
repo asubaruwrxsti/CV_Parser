@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onMount, beforeUpdate } from "svelte";
 	import { fade } from "svelte/transition";
 	import Modal from "../components/Modal.svelte";
 	import LoginForm from "../components/LoginForm.svelte";
