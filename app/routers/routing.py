@@ -9,10 +9,11 @@ router = APIRouter(dependencies=[Depends(CORS)])
 def get_routes():
     routes = []
 
-    # TODO: Implement a better way to handle prohibited routes
+    # TODO: Implement permission to access routes
     prohibited_routes = [
         '/auth',
         '/routing',
+        '/users'
     ]
 
     # get all routers in the app.routers package

@@ -43,6 +43,9 @@ class SessionManager(metaclass=Singleton):
         if session_id in self.sessions:
             del self.sessions[session_id]
     
+    def clear_all_sessions(self):
+        self.sessions = {}
+    
     def generate_session_id(self):
         return str(uuid.uuid4())
 

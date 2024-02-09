@@ -33,7 +33,6 @@
     in:slide={{ delay: 100, duration: 500, easing: cubicOut }}
 >
     <div class="flex items-center justify-center text-center">
-        <span class="material-icons text-6xl mr-2">account_circle</span>
         <h2 class="text-3xl text-gray-900">Sign in to your account</h2>
     </div>
     <form class="mt-8 space-y-6" on:submit|preventDefault={handleLogin}>

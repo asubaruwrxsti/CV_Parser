@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Request, Depends
-from app.dependencies import Database, SessionManager, CORS, Redis
+from app.dependencies import Database, SessionManager, CORS
 import hashlib
 
 router = APIRouter(dependencies=[Depends(CORS)])
@@ -22,9 +22,11 @@ async def login(request: Request):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-@router.post("/logout/{session_id}")
-def logout(session_id: str):
-	session_manager.delete_session(session_id)
+@router.get("/logout")
+def logout():
+	# TODO: Implement the logout functionality correctly
+	# DEBUG
+	session_manager.clear_all_sessions()
 	return {"message": "Logged out successfully"}
 
 @router.get("/getusers/me")
