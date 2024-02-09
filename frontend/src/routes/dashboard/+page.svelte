@@ -3,13 +3,28 @@
     import Swup from "swup";
 
     let isLoading = true;
+    let projects: any = [];
 
-    onMount(() => {
+    onMount(async () => {
         const swup = new Swup();
 
         // TODO: Check if session exists, and has not expired
         if (!localStorage.getItem("session")) {
             window.location.href = "/login";
+        }
+		try{
+			let projectUrl = "http://localhost:8000/projects/";
+			let response = await fetch(projectUrl, {
+				method: "GET",
+				headers: {
+					"Authorization": `Bearer ${localStorage.getItem("session")}`
+				}
+			});
+            projects = await response.json().then((data) => {
+                console.log(data)
+            });
+		} catch (error) {
+            console.log(error);
         }
 
         setTimeout(() => {
@@ -30,7 +45,7 @@
 >
 	<div class="grid grid-cols-3 gap-16 mt-16">
 		<div class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition duration-500 transform hover:scale-105">
-			<h2 class="text-2xl font-bold mb-2">Current Project</h2>
+			<h2 class="text-2xl font-bold mb-2">Leading Project</h2>
 			<p class="text-gray-700">This is a sample project name.</p>
 		</div>
 		<div class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition duration-500 transform hover:scale-105">

@@ -31,7 +31,8 @@ class SessionManager(metaclass=Singleton):
         encoded_jwt = jwt.encode(
             {
                 "session_id": session_id, 
-                "exp": time.time() + 3600
+                "exp": time.time() + 3600,
+                "data": data
             },
             env["JWT_SECRET"],
             algorithm=env["JWT_ALGORITHM"]

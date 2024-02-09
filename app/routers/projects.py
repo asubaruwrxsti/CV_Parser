@@ -1,6 +1,10 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Header, HTTPException
+from typing import Annotated
 from app.models.models import Project
 from app.dependencies import Database
+import json
+import jwt
+
 router = APIRouter()
 
 project = Project()
@@ -9,9 +13,33 @@ project = Project()
 async def read():    
     return await project.get_records(Database())
 
-@router.get("/{project_id}")
+@router.get("/user/{project_id}")
 async def read_project(project_id: int):
     return await project.get_records(Database(), project_id)
+
+@router.get("/user")
+async def read_items(session: Annotated[str | None, Header()] = None):
+    if session is None:
+        raise HTTPException(status_code=400, detail="Session token is missing")
+
+    session = session.strip('"')
+
+    try:
+        userId = jwt.decode(session, "secret", algorithms=["HS256"])["data"]["id"]
+
+        # Fetch column names dynamically
+        column_names = [column[0] for column in Database().query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' ORDER BY ORDINAL_POSITION")]
+
+        userLeadingProjects = Database().query(f"SELECT * FROM projects WHERE leader = '{userId}'")
+        userParticipatingProjects = Database().query(f"SELECT * FROM projects WHERE ',' || participants || ',' LIKE '%,{userId},%'")
+
+        # Convert project data into dictionaries with column names
+        userLeadingProjects = [{column_names[i]: project[i] for i in range(len(column_names))} for project in userLeadingProjects]
+        userParticipatingProjects = [{column_names[i]: project[i] for i in range(len(column_names))} for project in userParticipatingProjects]
+
+        return {'userLeadingProjects': userLeadingProjects, 'userParticipatingProjects': userParticipatingProjects }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f'Error: {str(e)}')
 
 @router.post("/")
 async def create(request: Request):
