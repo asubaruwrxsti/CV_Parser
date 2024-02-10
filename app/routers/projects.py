@@ -2,11 +2,9 @@ from fastapi import APIRouter, Request, Header, HTTPException
 from typing import Annotated
 from app.models.models import Project
 from app.dependencies import Database
-import json
 import jwt
 
 router = APIRouter()
-
 project = Project()
 
 @router.get("/")
@@ -18,16 +16,17 @@ async def read_project(project_id: int):
     return await project.get_records(Database(), project_id)
 
 @router.get("/user")
-async def read_items(session: Annotated[str | None, Header()] = None):
-    if session is None:
+async def read_items(Authorization: Annotated[str | None, Header()] = None):
+    if Authorization is None:
         raise HTTPException(status_code=400, detail="Session token is missing")
 
-    session = session.strip('"')
+    Authorization = Authorization.strip("Bearer ")
+    Authorization = Authorization.strip('"')
 
     try:
-        userId = jwt.decode(session, "secret", algorithms=["HS256"])["data"]["id"]
+        userId = jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
 
-        # Fetch column names dynamically
+        # Fetch column names from the projects table
         column_names = [column[0] for column in Database().query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' ORDER BY ORDINAL_POSITION")]
 
         userLeadingProjects = Database().query(f"SELECT * FROM projects WHERE leader = '{userId}'")
@@ -52,6 +51,7 @@ async def create(request: Request):
             participants=form_data['participants'],
             status=form_data['status']
         )
+        # return {"Create": form_data}
         await project.create_record(Database())
         return {"Create": "project"}
     except Exception as e:

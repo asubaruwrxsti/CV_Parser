@@ -50,7 +50,10 @@ class TableRecord(BaseModel, ABC):
             # Assuming self.fields is a dictionary where keys are field names
             # Add 'id' as the first key
             keys = ['id'] + list(self.fields.keys())
-            result_dict = [dict(zip(keys, row)) for row in result]
+            if result is not None:
+                result_dict = [dict(zip(keys, row)) for row in result]
+            else:
+                result_dict = []
             return result_dict
         except errors.UniqueViolation as e:
             raise HTTPException(status_code=409, detail=str(e))

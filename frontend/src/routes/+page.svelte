@@ -1,28 +1,22 @@
 <script lang="ts">
-	import { onMount, beforeUpdate } from "svelte";
 	import { fade } from "svelte/transition";
 	import Modal from "../components/Modal.svelte";
 	import LoginForm from "../components/LoginForm.svelte";
-	import Swup from "swup";
+	import { browser } from "$app/environment";
 
 	let isLoading = true;
 	let showModal = false;
 	let showLogin = false;
 
-	onMount(() => {
-		const swup = new Swup({
-			containers: ["#swup"],
-		});
-
+	if (browser) {
 		// TODO: Check if session exists, and has not expired
 		if (localStorage.getItem("session")) {
+			setTimeout(() => {
+				isLoading = false;
+			}, 500);
 			window.location.href = "/dashboard";
 		}
-
-		setTimeout(() => {
-			isLoading = false;
-		}, 500);
-	});
+	}
 </script>
 
 <div class="h-screen flex transition-main" id="swup">
