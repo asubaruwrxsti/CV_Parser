@@ -45,7 +45,7 @@
 	</div>
 {:else}
 	<div class="flex items-start justify-center transition-main" id="swup">
-		<div class="flex justify-between mt-16 items-start" style="gap: 6rem;">
+		<div class="flex justify-between mt-16 items-start" style="gap: 4rem;">
 			<div
 				class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 flex-1"
 			>

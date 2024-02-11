@@ -63,7 +63,7 @@
 			<DropdownItem>Sign out</DropdownItem>
 		</Dropdown>
         <NavUl>
-            <NavLi href="/" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
+            <NavLi href="/dashboard" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
 				Home
 			</NavLi>
             {#each routes as route}

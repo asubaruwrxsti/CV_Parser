@@ -11,9 +11,28 @@ project = Project()
 async def read():    
     return await project.get_records(Database())
 
-@router.get("/user/{project_id}")
-async def read_project(project_id: int):
-    return await project.get_records(Database(), project_id)
+@router.get("/user/participants")
+async def read_participants_of_user_leading(Authorization: Annotated[str | None, Header()] = None):
+    if Authorization is None:
+        raise HTTPException(status_code=400, detail="Session token is missing")
+
+    Authorization = Authorization.strip("Bearer ")
+    Authorization = Authorization.strip('"')
+
+    try:
+        userId = jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
+
+        participants = Database().query(f"SELECT participants FROM projects WHERE leader = '{userId}'")
+        participants = [participant[0].split(",") for participant in participants]
+
+        participant_names = []
+        for participant in participants:
+            result = Database().query(f"SELECT id, username FROM users WHERE id IN ({','.join(participant)})")
+            participant_names.append(result)
+        
+        return {'participants': participant_names}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f'Error: {str(e)}')
 
 @router.get("/user")
 async def read_items(Authorization: Annotated[str | None, Header()] = None):
