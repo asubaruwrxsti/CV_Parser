@@ -1,5 +1,6 @@
 from .db import Database as BaseDatabase
-from fastapi import Request, Response
+from fastapi import Request, Response, Header, HTTPException
+from typing import Annotated
 from app.utils.helperFunctions import loadEnv
 import uuid
 import time
@@ -55,6 +56,19 @@ def CORS(request: Request, response: Response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
     response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,GET,POST'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+
+def get_current_user(Authorization: Annotated[str | None, Header()] = None):
+    if Authorization is None:
+        raise HTTPException(status_code=400, detail="Session token is missing")
+
+    Authorization = Authorization.strip("Bearer ")
+    Authorization = Authorization.strip('"')
+
+    try:
+        userId = jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
+        return userId
+    except:
+        raise HTTPException(status_code=400, detail="Invalid token")
 
 class Redis(metaclass=Singleton):
     def __init__(self):

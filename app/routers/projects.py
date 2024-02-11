@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Request, Header, HTTPException
-from typing import Annotated
+from fastapi import APIRouter, Request, Header, HTTPException, Depends
 from app.models.models import Project
-from app.dependencies import Database
+from app.dependencies import Database, get_current_user
 import jwt
 
 router = APIRouter()
@@ -12,16 +11,9 @@ async def read():
     return await project.get_records(Database())
 
 @router.get("/user/participants")
-async def read_participants_of_user_leading(Authorization: Annotated[str | None, Header()] = None):
-    if Authorization is None:
-        raise HTTPException(status_code=400, detail="Session token is missing")
-
-    Authorization = Authorization.strip("Bearer ")
-    Authorization = Authorization.strip('"')
+async def read_participants_of_user_leading(userId: str = Depends(get_current_user)):
 
     try:
-        userId = jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
-
         participants = Database().query(f"SELECT participants FROM projects WHERE leader = '{userId}'")
         participants = [participant[0].split(",") for participant in participants]
 
@@ -35,16 +27,8 @@ async def read_participants_of_user_leading(Authorization: Annotated[str | None,
         raise HTTPException(status_code=400, detail=f'Error: {str(e)}')
 
 @router.get("/user")
-async def read_items(Authorization: Annotated[str | None, Header()] = None):
-    if Authorization is None:
-        raise HTTPException(status_code=400, detail="Session token is missing")
-
-    Authorization = Authorization.strip("Bearer ")
-    Authorization = Authorization.strip('"')
-
+async def read_items(userId: str = Depends(get_current_user)):
     try:
-        userId = jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
-
         # Fetch column names from the projects table
         column_names = [column[0] for column in Database().query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' ORDER BY ORDINAL_POSITION")]
 

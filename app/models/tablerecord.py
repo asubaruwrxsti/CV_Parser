@@ -12,6 +12,9 @@ class TableRecord(BaseModel, ABC):
 
     def __init__(self, **data):
         super().__init__(**data)
+        for field in self.fields:
+            if field in data:
+                self.fields[field] = data[field]
         self._create_table(Database())
 
     async def create_record(self, db: Database):
