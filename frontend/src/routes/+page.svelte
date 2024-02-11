@@ -2,6 +2,8 @@
 	import { fade } from "svelte/transition";
 	import Modal from "../components/Modal.svelte";
 	import LoginForm from "../components/LoginForm.svelte";
+	import { checkSession } from "../services/sessionManager";
+	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 
 	let isLoading = true;
@@ -9,14 +11,19 @@
 	let showLogin = false;
 
 	if (browser) {
-		// TODO: Check if session exists, and has not expired
-		if (localStorage.getItem("session")) {
-			setTimeout(() => {
-				isLoading = false;
-			}, 500);
-			window.location.href = "/dashboard";
-		}
+		setTimeout(() => {
+			isLoading = false;
+		}, 500);
 	}
+
+	onMount(async () => {
+		const sessionValid = await checkSession();
+		if (sessionValid) {
+			window.location.href = "/dashboard";
+		} else {
+			isLoading = false;
+		}
+	});
 </script>
 
 <div class="h-screen flex transition-main" id="swup">

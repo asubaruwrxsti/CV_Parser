@@ -1,17 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { checkSession } from "../../services/sessionManager";
     import LoginForm from "../../components/LoginForm.svelte";
-    import Swup from "swup";
 
     let isLoading = true;
 
-    onMount(() => {
-        const swup = new Swup();
-
-        // TODO: Check if session exists, and has not expired
-        if (localStorage.getItem("session")) {
-            window.location.href = "/dashboard";
-        }
+    onMount(async () => {
+		const sessionValid = await checkSession();
+		if (sessionValid) {
+			window.location.href = "/dashboard";
+		} else {
+			isLoading = false;
+		}
 
         setTimeout(() => {
             isLoading = false;

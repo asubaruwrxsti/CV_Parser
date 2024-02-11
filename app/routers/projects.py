@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Header, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends
 from app.models.models import Project
 from app.dependencies import Database, get_current_user
 import jwt

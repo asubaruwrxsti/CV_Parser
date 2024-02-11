@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { checkSession } from "../../services/sessionManager";
     import { browser } from "$app/environment";
 
     let isLoading = true;
@@ -7,10 +8,12 @@
     let participants: any = [];
 
     onMount(async () => {
-        // TODO: Check if session exists, and has not expired
-        if (!localStorage.getItem("session")) {
-            window.location.href = "/login";
-        }
+		const sessionValid = await checkSession();
+		if (sessionValid) {
+			window.location.href = "/dashboard";
+		} else {
+			isLoading = false;
+		}
         try {
             let projectUrl = "http://localhost:8000/projects/user/";
             let response = await fetch(projectUrl, {
@@ -21,7 +24,7 @@
             });
             projects = await response.json().then((data) => {
                 console.log(data);
-                if (data.detail === "Error: Signature has expired") {
+                if (data.detail) {
                     localStorage.removeItem("session");
                     window.location.href = "/login";
                 }

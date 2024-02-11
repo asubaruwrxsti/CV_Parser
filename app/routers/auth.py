@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Request, Depends
-from app.dependencies import Database, SessionManager, CORS
+from app.dependencies import Database, get_current_user
+from app.services import CORS, SessionManager
 import hashlib
 
 router = APIRouter(dependencies=[Depends(CORS)])
@@ -33,15 +34,6 @@ def logout():
 	session_manager.clear_all_sessions()
 	return {"message": "Logged out successfully"}
 
-@router.get("/getusers/me")
-def get_user():
-	session = session_manager.get_current_user()
-	return session
-	if session:
-		return session
-	else:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Not logged in",
-			headers={"WWW-Authenticate": "Basic"},
-		)
+@router.get("/me")
+def session_expired(userId: str = Depends(get_current_user)):
+     return {"user": userId}

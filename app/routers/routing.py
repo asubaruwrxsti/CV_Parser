@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.dependencies import CORS
+from app.services import CORS
 import pkgutil
 import importlib
 
