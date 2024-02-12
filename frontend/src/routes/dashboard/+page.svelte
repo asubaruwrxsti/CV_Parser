@@ -51,15 +51,18 @@
         class="flex flex-wrap justify-center items-start transition-main"
         id="swup"
     >
-        <div
-            class="flex flex-wrap justify-center items-start mt-16 gap-16"
-        >
-        <!-- Render all cards -->
+        <div class="flex flex-wrap justify-center items-start mt-16 gap-16">
+            <!-- Render all cards -->
             {#each Object.keys(dashboard) as key}
                 <div
-                    class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 w-1/3"
+                    class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform w-1/3 {key.startsWith(
+                        'all_',
+                    )
+                        ? ''
+                        : 'hover:scale-105'}"
+                    style={key.startsWith("all_") ? "width: 70%" : ""}
                 >
-                <!-- Card title -->
+                    <!-- Card title -->
                     <h2 class="text-2xl font-bold mb-2">
                         {key
                             .split("_")
@@ -110,7 +113,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {#each dashboard[key] as item, index (item.id)}
+                                        {#each dashboard[key].slice(0, 4) as item, index (item.id)}
                                             <tr>
                                                 {#each Object.keys(item) as key}
                                                     {#if key !== "id"}
@@ -124,12 +127,16 @@
                                                 <td
                                                     class="border border-gray-300 px-4 py-2"
                                                 >
-                                                    <a
-                                                        href={`/dashboard/${key}/${item.id}`}
-                                                        class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
+                                                    <div
+                                                        class="flex justify-center"
                                                     >
-                                                        View
-                                                    </a>
+                                                        <a
+                                                            href={`/dashboard/${key}/${item.id}`}
+                                                            class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
+                                                        >
+                                                            View
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         {/each}
@@ -137,7 +144,7 @@
                                 </table>
                             </div>
                         {:else}
-                        <!-- Else, render as flex div -->
+                            <!-- Else, render as flex div -->
                             {#each dashboard[key] as item, index (item.id)}
                                 {#if index < 3}
                                     <div class="flex flex-wrap">
@@ -175,12 +182,19 @@
                         {/if}
                         <!-- View all button -->
                         {#if dashboard[key].length > 3}
-                            <a
-                                href={`/dashboard/${key}`}
-                                class="mt-6 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
+                            <div
+                                style="display: flex; justify-content: center;"
                             >
-                                View All
-                            </a>
+                                <a
+                                    href={`/dashboard/${key}`}
+                                    class="mt-6 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
+                                    style={key.startsWith("all_")
+                                        ? "width: 30%"
+                                        : "width: 60%"}
+                                >
+                                    View All
+                                </a>
+                            </div>
                         {/if}
                     </div>
                 </div>
