@@ -12,6 +12,15 @@ class Visit(TableRecord):
         'ip': 'VARCHAR(255)'
     }
 
+class Router(TableRecord):
+    table_name: str = 'router'
+    fields: Dict[str, str] = {
+        'name': None,
+    }
+    field_types: Dict[str, str] = {
+        'na,e': 'VARCHAR(255)',
+    }
+
 class Users(TableRecord):
     table_name: str = 'users'
     fields: Dict[str, str] = {
@@ -29,38 +38,11 @@ class Users(TableRecord):
         'group_id': 'VARCHAR(255)',
     }
 
-class Group(TableRecord):
-    table_name: str = 'groups'
-    fields: Dict[str, str] = {
-        'name': None,
-        'users': None, # JSON
-        'permissions': None # JSON
-    }
-    field_types: Dict[str, str] = {
-        'name': 'VARCHAR(255)',
-        'users': 'VARCHAR(255)',
-        'permissions': 'VARCHAR(255)'
-    }
-
-class Permissions(TableRecord):
-    table_name: str = 'permissions'
-    fields: Dict[str, str] = {
-        'name': None,
-        'group_id': None, # id
-        'permissions': None # JSON
-    }
-    field_types: Dict[str, str] = {
-        'name': 'VARCHAR(255)',
-        'group_id': 'VARCHAR(255)',
-        'permissions': 'VARCHAR(255)'
-    }
-
 class Project(TableRecord):
     table_name: str = 'projects'
     fields: Dict[str, str] = {
         'name': None,
         'description': None,
-        'leader': None, # id
         'participants': None, # JSON
         'status': None
     }
@@ -78,24 +60,16 @@ class CV(TableRecord):
         'name': None,
         'phone': None,
         'email': None,
-        'personal_description': None, # JSON
-        'previous_experiences': None, # JSON
-        'education': None, # JSON
-        'skills': None, # JSON
     }
 
     field_types: Dict[str, str] = {
         'name': 'VARCHAR(255)',
         'phone': 'VARCHAR(255)',
         'email': 'VARCHAR(255)',
-        'personal_description': 'VARCHAR(255)',
-        'previous_experiences': 'VARCHAR(255)',
-        'education': 'VARCHAR(255)',
-        'skills': 'VARCHAR(255)',
     }
 
-class Candidate(TableRecord):
-    table_name: str = 'candidates'
+class Applicants(TableRecord):
+    table_name: str = 'applicants'
     fields: Dict[str, str] = {
         'name': None,
         'cv_id': None,

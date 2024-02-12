@@ -63,9 +63,6 @@
 			<DropdownItem>Sign out</DropdownItem>
 		</Dropdown>
         <NavUl>
-            <NavLi href="/dashboard" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
-				Dashboard
-			</NavLi>
             {#each routes as route}
                 <NavLi href="/{route}" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
                     {route.charAt(0).toUpperCase() + route.slice(1)}
