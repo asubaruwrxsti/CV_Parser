@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Request, Depends
 from app.dependencies import Database, get_current_user
-from app.services.service import CORS, SessionManager
+from app.services import service
 import hashlib
 
-router = APIRouter(dependencies=[Depends(CORS)])
-session_manager = SessionManager()
+router = APIRouter(dependencies=[Depends(service.CORS)])
+session_manager = service.SessionManager()
 
 @router.post("/login")
 async def login(request: Request):

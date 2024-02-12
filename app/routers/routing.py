@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
-from app.services import CORS
+from app.services import service
 import pkgutil
 import importlib
 
-router = APIRouter(dependencies=[Depends(CORS)])
+router = APIRouter(dependencies=[Depends(service.CORS)])
 
 @router.get("/routes")
 def get_routes():

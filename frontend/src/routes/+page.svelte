@@ -11,19 +11,21 @@
 	let showLogin = false;
 
 	if (browser) {
+		async () => {
+			const sessionValid = await checkSession();
+			if (sessionValid) {
+				window.location.href = "/dashboard";
+			} else {
+				isLoading = false;
+			}
+		};
+
 		setTimeout(() => {
 			isLoading = false;
 		}, 500);
 	}
 
-	onMount(async () => {
-		const sessionValid = await checkSession();
-		if (sessionValid) {
-			window.location.href = "/dashboard";
-		} else {
-			isLoading = false;
-		}
-	});
+	onMount(async () => {});
 </script>
 
 <div class="h-screen flex transition-main" id="swup">

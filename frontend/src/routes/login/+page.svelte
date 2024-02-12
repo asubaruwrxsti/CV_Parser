@@ -1,22 +1,24 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { browser } from "$app/environment";
     import { checkSession } from "../../services/sessionManager";
     import LoginForm from "../../components/LoginForm.svelte";
 
     let isLoading = true;
 
-    onMount(async () => {
-		const sessionValid = await checkSession();
-		if (sessionValid) {
-			window.location.href = "/dashboard";
-		} else {
-			isLoading = false;
-		}
+    if (browser) {
+        async () => {
+            const sessionValid = await checkSession();
+            if (sessionValid) {
+                window.location.href = "/dashboard";
+            } else {
+                isLoading = false;
+            }
+        };
 
         setTimeout(() => {
             isLoading = false;
         }, 500);
-    });
+    }
 </script>
 
 <div

@@ -8,12 +8,6 @@
     let participants: any = [];
 
     onMount(async () => {
-		const sessionValid = await checkSession();
-		if (sessionValid) {
-			window.location.href = "/dashboard";
-		} else {
-			isLoading = false;
-		}
         try {
             let projectUrl = "http://localhost:8000/projects/user/";
             let response = await fetch(projectUrl, {
@@ -54,6 +48,15 @@
     });
 
     if (browser) {
+        async () => {
+            const sessionValid = await checkSession();
+            if (sessionValid) {
+                window.location.href = "/dashboard";
+            } else {
+                isLoading = false;
+            }
+        };
+
         setTimeout(() => {
             isLoading = false;
         }, 500);
