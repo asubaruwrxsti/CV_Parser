@@ -48,11 +48,11 @@
     </div>
 {:else}
     <div
-        class="inline-block flex-wrap justify-center items-start transition-main"
+        class="flex flex-wrap justify-center items-start transition-main"
         id="swup"
     >
         <div
-            class="inline-block flex-wrap justify-center items-start mt-16 gap-16"
+            class="flex flex-wrap justify-center items-start mt-16 gap-16"
         >
         <!-- Render all cards -->
             {#each Object.keys(dashboard) as key}
