@@ -64,7 +64,7 @@
 		</Dropdown>
         <NavUl>
             <NavLi href="/dashboard" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
-				Home
+				Dashboard
 			</NavLi>
             {#each routes as route}
                 <NavLi href="/{route}" nonActiveClass="text-white hover:text-gray-400 transition-colors duration-200">
