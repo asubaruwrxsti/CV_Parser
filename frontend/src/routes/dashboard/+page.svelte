@@ -48,17 +48,143 @@
     </div>
 {:else}
     <div
-        class="flex flex-wrap justify-center items-start transition-main"
+        class="inline-block flex-wrap justify-center items-start transition-main"
         id="swup"
     >
-        <div class="flex flex-wrap justify-between items-start mt-16 gap-16">
-            <div
-                class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 flex-1"
-            >
-                <h2 class="text-2xl font-bold mb-2">You are leader in:</h2>
-                <div class="flex flex-col">
+        <div
+            class="inline-block flex-wrap justify-center items-start mt-16 gap-16"
+        >
+        <!-- Render all cards -->
+            {#each Object.keys(dashboard) as key}
+                <div
+                    class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 w-1/3"
+                >
+                <!-- Card title -->
+                    <h2 class="text-2xl font-bold mb-2">
+                        {key
+                            .split("_")
+                            .map(
+                                (part) =>
+                                    part.charAt(0).toUpperCase() +
+                                    part.slice(1),
+                            )
+                            .join(" ")}
+                    </h2>
+                    <!-- Card Content -->
+                    <div class="flex flex-col">
+                        <!-- If key name is all_, render as table -->
+                        {#if key.startsWith("all_")}
+                            <div class="flex justify-center">
+                                <table
+                                    class="w-full lg:w-4/5 table-auto my-4 rounded-lg"
+                                >
+                                    <thead>
+                                        <tr>
+                                            {#each Object.keys(dashboard[key][0]) as tableKey}
+                                                {#if tableKey !== "id"}
+                                                    <th
+                                                        class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
+                                                    >
+                                                        {tableKey
+                                                            .split("_")
+                                                            .map(
+                                                                (part) =>
+                                                                    part
+                                                                        .charAt(
+                                                                            0,
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                    part.slice(
+                                                                        1,
+                                                                    ),
+                                                            )
+                                                            .join(" ")}
+                                                    </th>
+                                                {/if}
+                                            {/each}
+                                            <th
+                                                class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
+                                            >
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {#each dashboard[key] as item, index (item.id)}
+                                            <tr>
+                                                {#each Object.keys(item) as key}
+                                                    {#if key !== "id"}
+                                                        <td
+                                                            class="border border-gray-300 px-4 py-2"
+                                                        >
+                                                            {item[key]}
+                                                        </td>
+                                                    {/if}
+                                                {/each}
+                                                <td
+                                                    class="border border-gray-300 px-4 py-2"
+                                                >
+                                                    <a
+                                                        href={`/dashboard/${key}/${item.id}`}
+                                                        class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
+                                                    >
+                                                        View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {:else}
+                        <!-- Else, render as flex div -->
+                            {#each dashboard[key] as item, index (item.id)}
+                                {#if index < 3}
+                                    <div class="flex flex-wrap">
+                                        {#each Object.keys(item) as key}
+                                            {#if key !== "id" && item[key] !== null}
+                                                <div
+                                                    class="flex flex-col mb-4 mr-4"
+                                                >
+                                                    <span class="text-gray-500">
+                                                        {key
+                                                            .split("_")
+                                                            .map(
+                                                                (part) =>
+                                                                    part
+                                                                        .charAt(
+                                                                            0,
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                    part.slice(
+                                                                        1,
+                                                                    ),
+                                                            )
+                                                            .join(" ")}
+                                                    </span>
+                                                    <span
+                                                        class="text-lg font-bold"
+                                                        >{item[key]}</span
+                                                    >
+                                                </div>
+                                            {/if}
+                                        {/each}
+                                    </div>
+                                {/if}
+                            {/each}
+                        {/if}
+                        <!-- View all button -->
+                        {#if dashboard[key].length > 3}
+                            <a
+                                href={`/dashboard/${key}`}
+                                class="mt-6 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
+                            >
+                                View All
+                            </a>
+                        {/if}
+                    </div>
                 </div>
-            </div>
+            {/each}
         </div>
     </div>
 {/if}

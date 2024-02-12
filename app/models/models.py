@@ -49,7 +49,6 @@ class Project(TableRecord):
     field_types: Dict[str, str] = {
         'name': 'VARCHAR(255)',
         'description': 'VARCHAR(255)',
-        'leader': 'VARCHAR(255)',
         'participants': 'VARCHAR(255)',
         'status': 'VARCHAR(255)'
     }

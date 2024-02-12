@@ -19,8 +19,13 @@ async def dashboard(userId: str = Depends(get_current_user)):
         participants = Database().query(f"SELECT id, username FROM users WHERE id IN ({','.join(participantsID)})")
         project['participants'] = participants
 
+    # New Applicants
     applicantsColumnName = [column[0] for column in Database().query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'applicants' ORDER BY ORDINAL_POSITION")]
     new_applicants = Database().query(f"SELECT * FROM applicants ORDER BY id DESC")
     new_applicants = [{applicantsColumnName[i]: applicant[i] for i in range(len(applicantsColumnName))} for applicant in new_applicants]
 
-    return {"active_project": active_project, "new_applicants": new_applicants}
+    # All Projects
+    all_projects = Database().query(f"SELECT * FROM projects")
+    all_projects = [{projectColumnName[i]: project[i] for i in range(len(projectColumnName))} for project in all_projects]
+
+    return {"active_project": active_project, "new_applicants": new_applicants, "all_projects": all_projects}

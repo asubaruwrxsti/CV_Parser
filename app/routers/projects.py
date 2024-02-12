@@ -18,7 +18,6 @@ async def create(request: Request):
         project = Project(
             name=form_data['name'],
             description=form_data['description'],
-            leader=form_data['leader'],
             participants=form_data['participants'],
             status=form_data['status']
         )
