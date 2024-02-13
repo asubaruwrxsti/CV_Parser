@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
     import { checkSession } from "../../services/sessionManager";
     import { browser } from "$app/environment";
 
@@ -50,6 +51,7 @@
     <div
         class="flex flex-wrap justify-center items-start transition-main"
         id="swup"
+		in:fade={{ duration: 400 }}
     >
         <div class="flex flex-wrap justify-center items-start mt-16 gap-16">
             <!-- Render all cards -->
@@ -60,10 +62,10 @@
                     )
                         ? ''
                         : 'hover:scale-105'}"
-                    style={key.startsWith("all_") ? "width: 70%" : ""}
+                    style={key.startsWith("all_") ? "width: 90%" : ""}
                 >
                     <!-- Card title -->
-                    <h2 class="text-2xl font-bold mb-2">
+                    <h2 class="text-2xl font-bold mb-6">
                         {key
                             .split("_")
                             .map(
@@ -79,7 +81,7 @@
                         {#if key.startsWith("all_")}
                             <div class="flex justify-center">
                                 <table
-                                    class="w-full lg:w-4/5 table-auto my-4 rounded-lg"
+                                    class="w-full lg:w-4/5 mx-auto w-full"
                                 >
                                     <thead>
                                         <tr>
@@ -101,14 +103,14 @@
                                                                         1,
                                                                     ),
                                                             )
-                                                            .join(" ")}
+                                                            .join(" ").toUpperCase()}
                                                     </th>
                                                 {/if}
                                             {/each}
                                             <th
                                                 class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
                                             >
-                                                Actions
+                                                ACTIONS
                                             </th>
                                         </tr>
                                     </thead>

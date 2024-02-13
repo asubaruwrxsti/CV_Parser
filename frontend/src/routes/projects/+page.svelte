@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
 	import { checkSession } from "../../services/sessionManager";
 	import { browser } from "$app/environment";
 
@@ -48,7 +49,11 @@
 		></div>
 	</div>
 {:else}
-	<div class="flex items-start justify-center transition-main" id="swup">
+	<div
+		class="flex items-start justify-center transition-main"
+		id="swup"
+		in:fade={{ duration: 400 }}
+	>
 		<div class="flex justify-between mt-16 items-start w-4/5">
 			<div
 				class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform flex-1"
