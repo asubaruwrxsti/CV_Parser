@@ -1,11 +1,19 @@
 <script lang="ts">
     import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
+	import { Body, style } from 'svelte-body';
+	import Modal from "../../components/Modal.svelte";
     import { checkSession } from "../../services/sessionManager";
     import { browser } from "$app/environment";
 
     let isLoading = true;
     let dashboard: any = [];
+	let showModal = false;
+	let currentData: any = [];
+
+	$: bodyStyle = {
+		"filter": showModal ? "blur(5px)" : "none",
+	};
 
     onMount(async () => {
         try {
@@ -132,12 +140,16 @@
                                                     <div
                                                         class="flex justify-center"
                                                     >
-                                                        <a
-                                                            href={`/dashboard/${key}/${item.id}`}
+                                                        <button
                                                             class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
+															on:click={() => {
+																currentData = item;
+																showModal = true;
+																console.log(currentData);
+															}}
                                                         >
-                                                            View
-                                                        </a>
+                                                            Details
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -188,7 +200,7 @@
                                 style="display: flex; justify-content: center;"
                             >
                                 <a
-                                    href={`/dashboard/${key}`}
+                                    href={`/${key.split("_")[1]}`}
                                     class="mt-6 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
                                     style={key.startsWith("all_")
                                         ? "width: 30%"
@@ -204,3 +216,36 @@
         </div>
     </div>
 {/if}
+
+<Body style={bodyStyle} />
+
+<Modal bind:showModal>
+	<h2
+		slot="header"
+		class="text-2xl font-semibold mb-8 text-center text-black-600"
+	>
+		Details
+	</h2>
+
+	<div slot="body" class="w-full mb-8 p-4 bg-gray-100 rounded shadow" style="width: 400px">
+		{#if currentData}
+			{#each Object.keys(currentData) as key}
+				{#if key !== "id"}
+					<div class="flex flex-col mb-4">
+						<span class="text-gray-500">
+							{key
+								.split("_")
+								.map(
+									(part) =>
+										part.charAt(0).toUpperCase() +
+										part.slice(1),
+								)
+								.join(" ")}
+						</span>
+						<span class="text-lg font-bold">{currentData[key]}</span>
+					</div>
+				{/if}
+			{/each}
+		{/if}
+	</div>
+</Modal>

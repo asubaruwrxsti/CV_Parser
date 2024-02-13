@@ -20,7 +20,7 @@
         <button
             autofocus
             on:click={() => dialog.close()}
-            class="mt-2 bg-blue-500 hover:bg-blue-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out"
+            class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out"
         >
             Close
         </button>
