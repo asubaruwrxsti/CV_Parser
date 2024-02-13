@@ -5,6 +5,7 @@
 
 	let isLoading = true;
 	let projects: any = [];
+	let headers: any = [];
 
 	onMount(async () => {
 		try {
@@ -16,7 +17,7 @@
 				},
 			});
 			projects = await response.json().then((data) => {
-				console.log(data)
+				headers = Object.keys(data[0]);
 				return data;
 			});
 		} catch (error) {
@@ -47,59 +48,64 @@
 		></div>
 	</div>
 {:else}
-	<!-- <div class="flex items-start justify-center transition-main" id="swup">
-		<div class="flex justify-between mt-16 items-start" style="gap: 4rem;">
+	<div class="flex items-start justify-center transition-main" id="swup">
+		<div class="flex justify-between mt-16 items-start w-4/5">
 			<div
-				class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 flex-1"
+				class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform flex-1"
 			>
-				<h2 class="text-2xl font-bold mb-2">You are participant in:</h2>
-				<div class="flex flex-col">
-					{#if projects.userParticipatingProjects.length > 0}
-						{#each projects.userParticipatingProjects.slice(0, 3) as project (project.id)}
-							<a
-								href="#!"
-								class="text-gray-700 mb-2 transition-all duration-500 border border-gray-200 p-2 rounded hover:border-teal-400 hover:bg-teal-200"
-							>
-								{project.name}
-							</a>
-						{/each}
-						{#if projects.userParticipatingProjects.length > 3}
-							<a
-								href="#!"
-								class="mt-2 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
-								>View All</a
-							>
-						{/if}
-					{:else}
-						<p class="text-gray-700">No projects found.</p>
-					{/if}
+				<div class="flex items-center justify-between mb-16">
+					<h1 class="text-4xl font-bold">Projects</h1>
+					<button
+						class="bg-white text-teal-500 border border-teal-500 p-2 rounded shadow transition-all duration-500 hover:bg-teal-500 hover:text-white hover:shadow-lg hover:scale-105 transform-gpu flex items-center"
+					>
+						<span class="material-icons mr-2"> add </span>
+						New Project
+					</button>
 				</div>
-			</div>
-			<div
-				class="bg-white rounded-2xl shadow-2xl p-20 hover:shadow-white transition-all duration-500 transform hover:scale-105 flex-1"
-			>
-				<h2 class="text-2xl font-bold mb-2">You are leader in:</h2>
-				<div class="flex flex-col">
-					{#if projects.userLeadingProjects.length > 0}
-						{#each projects.userLeadingProjects.slice(0, 3) as project (project.id)}
-							<a
-								href="#!"
-								class="text-gray-700 mb-2 transition-all duration-500 border border-gray-200 p-2 rounded hover:border-teal-400 hover:bg-teal-200"
+				<table class="mx-auto w-full border border-collapse">
+					<thead>
+						<tr>
+							{#each headers as header}
+								{#if header !== "id"}
+									<th
+										class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
+										>{header.toUpperCase()}</th
+									>
+								{/if}
+							{/each}
+							<th
+								class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
+								>Actions</th
 							>
-								{project.name}
-							</a>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+						{#each projects as project (project.id)}
+							<tr
+								class="hover:bg-gray-300 transition-all duration-500"
+							>
+								{#each headers as header, index (header)}
+									{#if index !== 0}
+										<td class="border px-4">
+											{project[header]}
+										</td>
+									{/if}
+								{/each}
+								<td
+									class="border px-4 py-4 items-center justify-center"
+								>
+									<a
+										href="#!"
+										class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
+									>
+										Details
+									</a>
+								</td>
+							</tr>
 						{/each}
-						{#if projects.userLeadingProjects.length > 3}
-							<button
-								class="mt-2 bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500"
-								>View All</button
-							>
-						{/if}
-					{:else}
-						<p class="text-gray-700">No projects found.</p>
-					{/if}
-				</div>
+					</tbody>
+				</table>
 			</div>
 		</div>
-	</div> -->
+	</div>
 {/if}
