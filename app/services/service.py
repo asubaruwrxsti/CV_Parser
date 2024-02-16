@@ -1,5 +1,5 @@
 from app.dependencies import Singleton
-from fastapi import Request, Response
+from fastapi import Request, Response, Depends
 from app.utils.helperFunctions import loadEnv
 import redis
 import jwt
@@ -31,8 +31,8 @@ class SessionManager(metaclass=Singleton):
 
 def CORS(request: Request, response: Response):
     # TODO: Apply the CORS policy from the environment
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
-    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,GET,POST'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
 

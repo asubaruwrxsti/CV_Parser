@@ -44,13 +44,15 @@ class Project(TableRecord):
         'name': None,
         'description': None,
         'participants': None, # JSON
-        'status': None
+        'status': None,
+        'image': None
     }
     field_types: Dict[str, str] = {
         'name': 'VARCHAR(255)',
         'description': 'VARCHAR(255)',
         'participants': 'VARCHAR(255)',
-        'status': 'VARCHAR(255)'
+        'status': 'VARCHAR(255)',
+        'image': 'VARCHAR(255)'
     }
 
 class CV(TableRecord):

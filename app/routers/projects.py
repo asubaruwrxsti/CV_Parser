@@ -1,15 +1,30 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
-from app.models.models import Project
+from app.models.models import Project, Applicants
 from app.dependencies import Database, get_current_user
 from app.services import service
-import jwt
 
-router = APIRouter(dependencies=[Depends(service.CORS)])
+router = APIRouter(dependencies=[Depends(service.CORS), Depends(get_current_user)])
 project = Project()
+applicants = Applicants()
 
 @router.get("/")
 async def read():    
     return await project.get_records(Database())
+
+@router.get("/{project_id}", dependencies=[Depends(service.CORS)])
+async def read(project_id: int):
+	p = await project.get_records(Database(), project_id)
+    
+	projectParticipants = p[0]['participants']
+	projectParticipants = projectParticipants.split(',')
+
+	participants = []
+	for participant in projectParticipants:
+		participant = await applicants.get_records(Database(), int(participant))
+		participants.append(participant)
+
+	p[0]['participants'] = participants
+	return p
 
 @router.post("/")
 async def create(request: Request):

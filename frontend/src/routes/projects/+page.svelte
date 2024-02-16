@@ -100,7 +100,7 @@
 									class="border px-4 py-4 items-center justify-center"
 								>
 									<a
-										href="#!"
+										href="{`/projects/${project.id}`}"
 										class="bg-teal-400 text-white p-2 rounded hover:bg-teal-500 transition-all duration-500 text-center"
 									>
 										Details
