@@ -21,7 +21,7 @@
 			});
 			project = await response.json().then((data) => {
 				console.log(data);
-				data[0].image = "No-Image-Placeholder.svg.png";
+				data[0].image = "";
 				return data;
 			});
 		} catch (error) {
@@ -104,13 +104,23 @@
 			</div>
 			{#each Object.keys(project[0]) as key (key)}
 				{#if key === "image"}
-					<div class="w-1/3 ml-16">
-						<img
-							class="w-full h-auto shadow-2xl scale-105"
-							src="/No-Image-Placeholder.svg.png"
-							alt={key}
-						/>
-					</div>
+					{#if project[0][key] !== ""}
+						<div class="w-1/3 ml-16">
+							<img
+								class="w-full h-auto shadow-2xl scale-105"
+								src={project[0][key]}
+								alt={key}
+							/>
+						</div>
+					{:else}
+						<div class="w-1/3 ml-16">
+							<img
+								class="w-full h-auto shadow-2xl scale-105"
+								src="/No-Image-Placeholder.svg.png"
+								alt={key}
+							/>
+						</div>
+					{/if}
 				{/if}
 			{/each}
 		</div>
