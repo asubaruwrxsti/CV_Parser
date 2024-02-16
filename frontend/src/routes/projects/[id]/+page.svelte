@@ -106,7 +106,7 @@
 				{#if key === "image"}
 					<div class="w-1/3 ml-16">
 						<img
-							class="w-full h-auto transform transition-all duration-500 hover:shadow-2xl hover:scale-105"
+							class="w-full h-auto shadow-2xl scale-105"
 							src="/No-Image-Placeholder.svg.png"
 							alt={key}
 						/>
