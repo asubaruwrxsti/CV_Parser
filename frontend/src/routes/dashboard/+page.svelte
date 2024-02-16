@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
-	import { Body, style } from 'svelte-body';
+	import { Body } from 'svelte-body';
 	import Modal from "../../components/Modal.svelte";
     import { checkSession } from "../../services/sessionManager";
     import { browser } from "$app/environment";
