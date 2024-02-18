@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import OperationalError, ProgrammingError
+from psycopg2.extras import DictCursor
 from app.utils.helperFunctions import loadEnv
 
 env = loadEnv()
@@ -23,10 +24,10 @@ class Database:
 
     def query(self, query, params=None):
         with self.connection:
-            with self.connection.cursor() as cursor:
+            with self.connection.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, params)
                 try:
-                    return cursor.fetchall()
+                    return [dict(row) for row in cursor.fetchall()]
                 except ProgrammingError:
                     return None
 

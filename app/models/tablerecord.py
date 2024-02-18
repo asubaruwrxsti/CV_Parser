@@ -50,14 +50,7 @@ class TableRecord(BaseModel, ABC):
         try:
             result = db.query(query, values)
             db.commit()
-            # Assuming self.fields is a dictionary where keys are field names
-            # Add 'id' as the first key
-            keys = ['id'] + list(self.fields.keys())
-            if result is not None:
-                result_dict = [dict(zip(keys, row)) for row in result]
-            else:
-                result_dict = []
-            return result_dict
+            return result
         except errors.UniqueViolation as e:
             raise HTTPException(status_code=409, detail=str(e))
         except errors.UndefinedTable as e:
