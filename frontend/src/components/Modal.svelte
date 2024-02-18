@@ -1,5 +1,6 @@
 <script lang="ts">
     export let showModal: boolean;
+    export let showCloseButton = true;
 
     let dialog: HTMLDialogElement;
 
@@ -17,13 +18,15 @@
         <slot name="header" />
         <slot name="body" />
         <!-- svelte-ignore a11y-autofocus -->
-        <button
-            autofocus
-            on:click={() => dialog.close()}
-            class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out"
-        >
-            Close
-        </button>
+        {#if showCloseButton}
+            <button
+                autofocus
+                on:click={() => dialog.close()}
+                class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out"
+            >
+                Close
+            </button>
+        {/if}
     </div>
 </dialog>
 
