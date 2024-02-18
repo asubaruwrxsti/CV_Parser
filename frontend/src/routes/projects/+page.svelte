@@ -11,11 +11,6 @@
 	let projects: any = [];
 	let headers: any = [];
 
-	let applicants: any = [];
-	let applicantNames: any = [];
-	let selectedApplicants: any = [];
-	let value: any = "";
-
 	let showModal = false;
 	$: bodyStyle = {
 		filter: showModal ? "blur(5px)" : "none",
@@ -32,31 +27,33 @@
 			});
 			projects = await response.json().then((data) => {
 				headers = Object.keys(data[0]);
-				console.log(data);
-				console.log(headers);
 				return data;
-			});
-
-			let applicantsUrl = "http://localhost:8000/participants/";
-			let applicantsResponse = await fetch(applicantsUrl, {
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("session")}`,
-				},
-			});
-			applicants = await applicantsResponse.json().then((data) => {
-				return data;
-			}).then((data) => {
-				applicantNames = data.map((applicant: any) => {
-					return applicant.name;
-				});
-				return applicantNames;
 			});
 		} catch (error) {
 			console.log(error);
 		}
-
 	});
+
+	async function loadOptions(name: string) {
+		let applicantUrl = `http://localhost:8000/participants/search`;
+		let response = await fetch(applicantUrl, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("session")}`,
+			},
+			body: JSON.stringify({ name: name }),
+		});
+		let data = await response.json();
+		return data.map((applicant: any) => {
+			console.log(applicant);
+			return {
+				value: applicant.id,
+				label: applicant.name,
+			};
+		});
+	}
+
+	const itemId = "id";
 
 	if (browser) {
 		async () => {
@@ -120,7 +117,7 @@
 					<tbody class="text-center">
 						{#each projects as project (project.id)}
 							<tr
-								class="hover:bg-gray-300 transition-all duration-500"
+								class="hover:bg-teal-100 transition-all duration-500"
 							>
 								{#each headers as header, index (header)}
 									{#if index !== 0}
@@ -150,7 +147,7 @@
 
 <Body style={bodyStyle} />
 
-<Modal bind:showModal>
+<Modal bind:showModal showCloseButton={false}>
 	<h2
 		slot="header"
 		class="text-2xl font-semibold mb-8 text-center text-black-600"
@@ -167,21 +164,30 @@
 			{#each headers as header}
 				{#if header !== "id"}
 					{#if header === "participants"}
-						<label
-							for={header}
-							class="block text-gray-600 font-semibold mb-2"
-							>{header.charAt(0).toUpperCase() +
-								header.slice(1)}</label
-						>
-						<Select
-							items={applicantNames}
-							bind:value
-						/>
-						{#if value}
-							<p class="text-gray-600 mt-2">
-								Selected: {value}
-							</p>
-						{/if}
+						<div class="mb-4">
+							<label
+								for={header}
+								class="block text-gray-600 font-semibold mb-2"
+								>{header.charAt(0).toUpperCase() +
+									header.slice(1)}</label
+							>
+							<Select {loadOptions} multiple={true} />
+						</div>
+					{:else if header === "image"}
+						<div class="mb-4">
+							<label
+								for={header}
+								class="block text-gray-600 font-semibold mb-2"
+								>{header.charAt(0).toUpperCase() +
+									header.slice(1)}</label
+							>
+							<input
+								type="file"
+								id={header}
+								name={header}
+								class="w-full p-10 border border-gray-300 rounded"
+							/>
+						</div>
 					{:else}
 						<div class="mb-4">
 							<label
@@ -200,6 +206,12 @@
 					{/if}
 				{/if}
 			{/each}
+			<button
+				type="submit"
+				class="bg-teal-500 text-white p-2 rounded hover:bg-teal-600 transition-all duration-500 w-full"
+			>
+				Create
+			</button>
 		</form>
 	</div>
 </Modal>
