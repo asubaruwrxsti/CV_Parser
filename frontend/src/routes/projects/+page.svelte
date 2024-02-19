@@ -81,10 +81,10 @@
 		event.preventDefault();
 		let formData = new FormData(event.target);
 		const fileField = event.target.querySelector('input[type="file"]');
+		const reader = new FileReader();
+		let fileBase64: string = "";
 
 		if (fileField.files.length != 0) {
-			const reader = new FileReader();
-			let fileBase64: string = "";
 
 			reader.onloadend = function () {
 				if (reader.result === null) {
