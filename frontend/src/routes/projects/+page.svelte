@@ -6,6 +6,7 @@
 	import { Body } from "svelte-body";
 	import Select from "svelte-select";
 	import Modal from "../../components/Modal.svelte";
+	import { truncate, isJson } from "../../utils/utils";
 
 	// Loading state
 	let isLoading = true;
@@ -74,14 +75,6 @@
 				label: applicant.name,
 			};
 		});
-	}
-
-	// Truncate text
-	function truncate(text: string, length: number) {
-		if (text === null || text === undefined) {
-			return "";
-		}
-		return text.length > length ? text.substring(0, length) + "..." : text;
 	}
 
 	// Create a new project submission
@@ -189,7 +182,7 @@
 					<thead>
 						<tr>
 							{#each headers as header}
-								{#if header !== "id"}
+								{#if header !== "id" && header !== "image"}
 									<th
 										class="bg-gray-200 text-gray-600 border border-gray-300 px-4 py-2"
 										>{header.toUpperCase()}</th
@@ -202,15 +195,32 @@
 							>
 						</tr>
 					</thead>
-					<tbody class="text-center">
+					<tbody class="items-center justify-start">
 						{#each projects as project (project.id)}
 							<tr
 								class="hover:bg-teal-100 transition-all duration-500"
 							>
 								{#each headers as header, index (header)}
-									{#if index !== 0}
+									{#if index !== 0 && header !== "image"}
 										<td class="border px-4">
-											{truncate(project[header], 100)}
+											{#if isJson(project[header])}
+												{#each JSON.parse(project[header]).slice(0, 3) as tag (tag)}
+													<div
+														class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+													>
+														<span>{tag.label}</span>
+													</div>
+												{/each}
+												{#if JSON.parse(project[header]).length > 3}
+													<div
+														class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+													>
+														<span>...</span>
+													</div>
+												{/if}
+											{:else}
+												{truncate(project[header], 100)}
+											{/if}
 										</td>
 									{/if}
 								{/each}

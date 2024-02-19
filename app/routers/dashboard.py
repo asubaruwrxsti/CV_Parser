@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.dependencies import Database, get_current_user
 from app.services import service
+import json
 
 router = APIRouter(dependencies=[Depends(service.CORS)])
 session_manager = service.SessionManager()
@@ -13,9 +14,8 @@ async def dashboard(userId: str = Depends(get_current_user)):
     active_project = Database().query(f"SELECT *, participants FROM projects WHERE status = 'active'")
 
     for project in active_project:
-        participantsID = project['participants'].split(",")
-        participants = Database().query(f"SELECT id, username FROM users WHERE id IN ({','.join(participantsID)})")
-        project['participants'] = participants
+        participants = json.loads(project['participants'])
+        project['participants'] = len(participants[0])
 
     # New Applicants
     new_applicants = Database().query(f"SELECT * FROM applicants ORDER BY id DESC")

@@ -40,15 +40,7 @@ async def create(request: Request):
             # Check if the image is a string
             if isinstance(project_data['image'], str):
                 # Remove the base64 prefix
-                base64_str = project_data['image'].split(',')[1]
-                # Convert the base64 string to bytes
-                image_bytes = base64.b64decode(base64_str)
-                # Convert bytes to image
-                image = Image.open(io.BytesIO(image_bytes))
-                # Save the image
-                image.save('image.png')
-                # Store the bytes directly, not as a BytesIO object
-                project_data['image'] = image_bytes
+                project_data['image'] = project_data['image'].split(',')[1]
             else:
                 project_data['image'] = None
                 # return {"Error": "Image is not a base64 string"}
