@@ -85,7 +85,6 @@
 		let fileBase64: string = "";
 
 		if (fileField.files.length != 0) {
-
 			reader.onloadend = function () {
 				if (reader.result === null) {
 					console.error("Failed to read file");
