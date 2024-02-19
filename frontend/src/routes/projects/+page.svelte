@@ -76,6 +76,14 @@
 		});
 	}
 
+	// Truncate text
+	function truncate(text: string, length: number) {
+		if (text === null || text === undefined) {
+			return "";
+		}
+		return text.length > length ? text.substring(0, length) + "..." : text;
+	}
+
 	// Create a new project submission
 	async function createProject(event: any) {
 		event.preventDefault();
@@ -84,23 +92,37 @@
 		const reader = new FileReader();
 		let fileBase64: string = "";
 
-		if (fileField.files.length != 0) {
-			reader.onloadend = function () {
-				if (reader.result === null) {
-					console.error("Failed to read file");
-				} else {
-					fileBase64 = reader.result as string;
-				}
+		reader.onloadend = function () {
+			if (reader.result === null) {
+				console.error("Failed to read file");
+			} else {
+				fileBase64 = reader.result as string;
+			}
 
-				// Add the base64 string to formData
-				formData.set(fileField.name, fileBase64);
+			// Add the base64 string to formData
+			formData.set(fileField.name, fileBase64);
 
-				// Add the tags to formData
-				formData.set("tor", JSON.stringify(tags));
-			};
+			// Send the request
+			sendRequest(formData);
+		};
+
+		if (fileField.files.length > 0) {
+			// If a file is present, read it
+			reader.readAsDataURL(fileField.files[0]);
+		} else {
+			// If no file is present, send the request immediately
+			sendRequest(formData);
+		}
+	}
+
+	function sendRequest(formData: FormData) {
+		// Add the tags to formData
+		// formData.set("tor", JSON.stringify(tags));
+
+		for (let [key, value] of formData.entries()) {
+			console.log(key, value);
 		}
 
-		// Send the request
 		let projectUrl = "http://localhost:8000/projects/";
 		fetch(projectUrl, {
 			method: "POST",
@@ -112,17 +134,13 @@
 			.then((response) => {
 				console.log(response);
 				if (response.status === 200) {
-					showModal = false;
-					window.location.reload();
+					// showModal = false;
+					// window.location.reload();
 				}
 			})
 			.catch((error) => {
 				console.error(error);
 			});
-
-		if (fileField.files.length > 0) {
-			reader.readAsDataURL(fileField.files[0]);
-		}
 	}
 
 	if (browser) {
@@ -192,7 +210,7 @@
 								{#each headers as header, index (header)}
 									{#if index !== 0}
 										<td class="border px-4">
-											{project[header]}
+											{truncate(project[header], 100)}
 										</td>
 									{/if}
 								{/each}
