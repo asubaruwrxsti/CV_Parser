@@ -18,7 +18,7 @@ class Router(TableRecord):
         'name': None,
     }
     field_types: Dict[str, str] = {
-        'na,e': 'VARCHAR(255)',
+        'name': 'VARCHAR(255)',
     }
 
 class Users(TableRecord):
@@ -50,11 +50,11 @@ class Project(TableRecord):
     }
     field_types: Dict[str, str] = {
         'name': 'VARCHAR(255)',
-        'description': 'VARCHAR(255)',
-        'tor': 'VARCHAR(255)',
+        'description': 'TEXT',
+        'tor': 'TEXT',
         'participants': 'VARCHAR(255)',
         'status': 'VARCHAR(255)',
-        'image': 'VARCHAR(255)'
+        'image': 'TEXT'
     }
 
 class CV(TableRecord):

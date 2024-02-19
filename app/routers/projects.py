@@ -30,13 +30,8 @@ async def read(project_id: int):
 async def create(request: Request):
     try:
         form_data = await request.form()
-        project = Project(
-            name=form_data['name'],
-            description=form_data['description'],
-            participants=form_data['participants'],
-            status=form_data['status']
-        )
-        # return {"Create": form_data}
+        project_data = {field: form_data.get(field, None) for field in Project().fields}
+        project = Project(**project_data)
         await project.create_record(Database())
         return {"Create": "project"}
     except Exception as e:

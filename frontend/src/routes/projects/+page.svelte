@@ -7,17 +7,25 @@
 	import Select from "svelte-select";
 	import Modal from "../../components/Modal.svelte";
 
+	// Loading state
 	let isLoading = true;
+
+	// Projects data
 	let projects: any = [];
 	let headers: any = [];
 
+	// Modal state
 	let showModal = false;
 	$: bodyStyle = {
 		filter: showModal ? "blur(5px)" : "none",
 	};
 
+	// Modal status state
+	let status = "inactive";
+
 	onMount(async () => {
 		try {
+			// Fetch projects
 			let projectUrl = "http://localhost:8000/projects/";
 			let response = await fetch(projectUrl, {
 				method: "GET",
@@ -34,6 +42,7 @@
 		}
 	});
 
+	// Load options for the select component
 	async function loadOptions(name: string) {
 		let applicantUrl = `http://localhost:8000/participants/search`;
 		let response = await fetch(applicantUrl, {
@@ -53,7 +62,51 @@
 		});
 	}
 
-	const itemId = "id";
+	// Create a new project submission
+	async function createProject(event: any) {
+		event.preventDefault();
+		let formData = new FormData(event.target);
+
+		const fileField = event.target.querySelector('input[type="file"]');
+		const reader = new FileReader();
+		let fileBase64: string = "";
+
+		reader.onloadend = function () {
+			if (reader.result === null) {
+				console.error("Failed to read file");
+			} else {
+				fileBase64 = reader.result as string;
+			}
+
+			// Add the base64 string to formData
+			formData.set(fileField.name, fileBase64);
+
+			// Send the request
+			let projectUrl = "http://localhost:8000/projects/";
+			console.log("Sending request to: ", projectUrl);
+			fetch(projectUrl, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("session")}`,
+				},
+				body: formData,
+			})
+				.then((response) => {
+					console.log(response);
+					if (response.status === 200) {
+						// showModal = false;
+						// window.location.reload();
+					}
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+		};
+
+		if (fileField.files.length > 0) {
+			reader.readAsDataURL(fileField.files[0]);
+		}
+	}
 
 	if (browser) {
 		async () => {
@@ -160,7 +213,7 @@
 		class="w-full mb-8 p-4 bg-gray-100 rounded shadow"
 		style="width: 400px"
 	>
-		<form>
+		<form on:submit|preventDefault={createProject}>
 			{#each headers as header}
 				{#if header !== "id"}
 					{#if header === "participants"}
@@ -171,7 +224,11 @@
 								>{header.charAt(0).toUpperCase() +
 									header.slice(1)}</label
 							>
-							<Select {loadOptions} multiple={true} />
+							<Select
+								{loadOptions}
+								multiple={true}
+								name={header}
+							/>
 						</div>
 					{:else if header === "image"}
 						<div class="mb-4">
@@ -185,8 +242,30 @@
 								type="file"
 								id={header}
 								name={header}
-								class="w-full p-10 border border-gray-300 rounded"
+								class="w-full p-10 border border-gray-300 rounded-xl"
 							/>
+						</div>
+					{:else if header === "status"}
+						<div class="mb-4">
+							<label
+								for={header}
+								class="block text-gray-600 font-semibold mb-2 {status ===
+								'active'
+									? 'text-green-500'
+									: 'text-red-500'}"
+							>
+								{header.charAt(0).toUpperCase() +
+									header.slice(1)}
+							</label>
+							<select
+								bind:value={status}
+								id={header}
+								name={header}
+								class="w-full p-2 border border-gray-300 rounded"
+							>
+								<option value="inactive">Inactive</option>
+								<option value="active">Active</option>
+							</select>
 						</div>
 					{:else}
 						<div class="mb-4">
