@@ -80,9 +80,9 @@
 	async function createProject(event: any) {
 		event.preventDefault();
 		let formData = new FormData(event.target);
+		const fileField = event.target.querySelector('input[type="file"]');
 
 		if (fileField.files.length != 0) {
-			const fileField = event.target.querySelector('input[type="file"]');
 			const reader = new FileReader();
 			let fileBase64: string = "";
 
