@@ -51,6 +51,7 @@
 			});
 			projects = await response.json().then((data) => {
 				headers = Object.keys(data[0]);
+				console.log(data);
 				return data;
 			});
 		} catch (error) {
@@ -110,7 +111,7 @@
 
 	function sendRequest(formData: FormData) {
 		// Add the tags to formData
-		// formData.set("tor", JSON.stringify(tags));
+		formData.set("tor", JSON.stringify(tags));
 
 		for (let [key, value] of formData.entries()) {
 			console.log(key, value);
@@ -208,7 +209,7 @@
 													<div
 														class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
 													>
-														<span>{tag.label}</span>
+														<span>{tag.label || tag}</span>
 													</div>
 												{/each}
 												{#if JSON.parse(project[header]).length > 3}

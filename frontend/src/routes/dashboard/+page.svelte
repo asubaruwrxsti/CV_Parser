@@ -5,7 +5,7 @@
 	import Modal from "../../components/Modal.svelte";
 	import { checkSession } from "../../services/sessionManager";
 	import { browser } from "$app/environment";
-	import { truncate } from "../../utils/utils";
+	import { truncate, isJson } from "../../utils/utils";
 
 	let isLoading = true;
 	let dashboard: any = [];
@@ -128,14 +128,31 @@
 											<tr>
 												{#each Object.keys(item) as key}
 													{#if key !== "id" && key !== "image"}
-														<td
-															class="border border-gray-300 px-4 py-2"
-														>
-															{truncate(
-																item[key],
-																100,
-															)}
-														</td>
+														{#if isJson(item[key])}
+															<td
+																class="border border-gray-300 px-4 py-2"
+															>
+																{#each JSON.parse(item[key]) as jsonItem}
+																	<div
+																		class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+																	>
+																		<span>
+																			{jsonItem.label ||
+																				jsonItem}
+																		</span>
+																	</div>
+																{/each}
+															</td>
+														{:else}
+															<td
+																class="border border-gray-300 px-4 py-2"
+															>
+																{truncate(
+																	item[key],
+																	100,
+																)}
+															</td>
+														{/if}
 													{/if}
 												{/each}
 												<td
@@ -190,13 +207,27 @@
 															)
 															.join(" ")}
 													</span>
-													<span
-														class="text-lg font-bold"
-														>{truncate(
-															item[key],
-															100,
-														)}</span
-													>
+													{#if isJson(item[key])}
+														{#each JSON.parse(item[key]) as jsonItem}
+															<div
+																class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+															>
+																<span>
+																	{jsonItem.label ||
+																		jsonItem}
+																</span>
+															</div>
+														{/each}
+													{:else}
+														<span
+															class="text-lg font-bold"
+														>
+															{truncate(
+																item[key],
+																300,
+															)}
+														</span>
+													{/if}
 												</div>
 											{/if}
 										{/each}
@@ -244,7 +275,7 @@
 	>
 		{#if currentData}
 			{#each Object.keys(currentData) as key}
-				{#if key !== "id"}
+				{#if key !== "id" && key !== "image"}
 					<div class="flex flex-col mb-4">
 						<span class="text-gray-500">
 							{key
@@ -256,8 +287,21 @@
 								)
 								.join(" ")}
 						</span>
-						<span class="text-lg font-bold">{currentData[key]}</span
-						>
+						<span class="text-lg font-bold">
+							{#if isJson(currentData[key])}
+								{#each JSON.parse(currentData[key]) as jsonItem}
+									<div
+										class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+									>
+										<span>
+											{jsonItem.label || jsonItem}
+										</span>
+									</div>
+								{/each}
+							{:else}
+								{truncate(currentData[key], 500)}
+							{/if}
+						</span>
 					</div>
 				{/if}
 			{/each}

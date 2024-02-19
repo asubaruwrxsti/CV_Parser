@@ -5,6 +5,7 @@
 	import { browser } from "$app/environment";
 	import { fade } from "svelte/transition";
 	import { checkSession } from "../../../services/sessionManager";
+	import { truncate, parseJsonValues } from "../../../utils/utils";
 
 	let isLoading = true;
 	let project: any = [];
@@ -20,8 +21,12 @@
 				},
 			});
 			project = await response.json().then((data) => {
+				// If the image data is in base64 format, decode it
+				if (data.image) {
+					data.image = "data:image/jpeg;base64," + data.image;
+				}
+				data = parseJsonValues(data);
 				console.log(data);
-				data[0].image = "";
 				return data;
 			});
 		} catch (error) {
@@ -58,64 +63,64 @@
 			in:fade={{ duration: 400 }}
 		>
 			<div class="w-2/3">
-				{#each Object.keys(project[0]) as key (key)}
+				{#each Object.keys(project) as key (key)}
 					{#if Array.isArray(project[key])}
-						<h2 class="text-2xl font-bold text-gray-800">{key}:</h2>
-					{:else if key !== "image"}
-						{#if key === "participants"}
-							<hr class="my-4" />
-							<div class="flex">
-								<div class="w-1/2">
-									<h2 class="text-lg font-bold text-gray-800">
-										{key.charAt(0).toUpperCase() +
-											key.slice(1)}:
-									</h2>
-								</div>
-								<div class="w-1/2">
-									{#each project[0][key] as participant (participant)}
-										{#each Object.keys(participant) as key (key)}
-											<div class="flex items-center">
-												<p
-													class="text-lg text-gray-600 flex-grow"
-												>
-													{participant[key].name}
-												</p>
-											</div>
-										{/each}
-									{/each}
-								</div>
-							</div>
-							<hr class="my-4" />
-						{:else if key !== "id" && key !== "image"}
-							<div class="flex items-center">
-								<strong
-									class="mr-16 flex-grow-0 flex-shrink-0 w-24"
-								>
-									{key.charAt(0).toUpperCase() +
-										key.slice(1)}:
-								</strong>
-								<p class="text-lg text-gray-600 flex-grow">
-									{project[0][key]}
-								</p>
-							</div>
-						{/if}
+						<hr class="my-4" />
+						<div class="flex items-center">
+							<strong
+								class="mr-16 flex-grow-0 flex-shrink-0 w-24"
+							>
+								{key.charAt(0).toUpperCase() + key.slice(1)}:
+							</strong>
+							{#each project[key] as item, index (index)}
+								{#if typeof item === "object" && item !== null && !Array.isArray(item)}
+									<div
+										class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+									>
+										<span>
+											{item.label}
+										</span>
+									</div>
+								{:else}
+									<div
+										class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+									>
+										<span>
+											{item}
+										</span>
+									</div>
+								{/if}
+							{/each}
+						</div>
+					{:else if key !== "id" && key !== "image"}
+						<hr class="my-4" />
+						<div class="flex items-center">
+							<strong
+								class="mr-16 flex-grow-0 flex-shrink-0 w-24"
+							>
+								{key.charAt(0).toUpperCase() + key.slice(1)}:
+							</strong>
+							<p class="text-lg text-gray-600 flex-grow">
+								{project[key]}
+							</p>
+						</div>
 					{/if}
 				{/each}
 			</div>
-			{#each Object.keys(project[0]) as key (key)}
+			{#each Object.keys(project) as key (key)}
 				{#if key === "image"}
-					{#if project[0][key] !== ""}
+					{#if project[key] !== null}
 						<div class="w-1/3 ml-16">
 							<img
-								class="w-full h-auto shadow-2xl scale-105"
-								src={project[0][key]}
+								class="w-full h-auto shadow-2xl scale-105 rounded-lg"
+								src={project[key]}
 								alt={key}
 							/>
 						</div>
 					{:else}
 						<div class="w-1/3 ml-16">
 							<img
-								class="w-full h-auto shadow-2xl scale-105"
+								class="w-full h-auto shadow-2xl scale-105 rounded-lg"
 								src="/No-Image-Placeholder.svg.png"
 								alt={key}
 							/>
