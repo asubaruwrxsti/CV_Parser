@@ -20,6 +20,21 @@
 		filter: showModal ? "blur(5px)" : "none",
 	};
 
+	// TOR tags
+	let tags: string[] = [];
+	let newTag = "";
+
+	function addTag() {
+		if (newTag) {
+			tags = [...tags, newTag];
+			newTag = "";
+		}
+	}
+
+	function removeTag(tagToRemove: string) {
+		tags = tags.filter((tag) => tag !== tagToRemove);
+	}
+
 	// Modal status state
 	let status = "inactive";
 
@@ -54,7 +69,6 @@
 		});
 		let data = await response.json();
 		return data.map((applicant: any) => {
-			console.log(applicant);
 			return {
 				value: applicant.id,
 				label: applicant.name,
@@ -71,37 +85,41 @@
 		const reader = new FileReader();
 		let fileBase64: string = "";
 
-		reader.onloadend = function () {
-			if (reader.result === null) {
-				console.error("Failed to read file");
-			} else {
-				fileBase64 = reader.result as string;
-			}
+		if (fileField.files.length != 0) {
+			reader.onloadend = function () {
+				if (reader.result === null) {
+					console.error("Failed to read file");
+				} else {
+					fileBase64 = reader.result as string;
+				}
 
-			// Add the base64 string to formData
-			formData.set(fileField.name, fileBase64);
+				// Add the base64 string to formData
+				formData.set(fileField.name, fileBase64);
 
-			// Send the request
-			let projectUrl = "http://localhost:8000/projects/";
-			console.log("Sending request to: ", projectUrl);
-			fetch(projectUrl, {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("session")}`,
-				},
-				body: formData,
+				// Add the tags to formData
+				formData.set("tor", JSON.stringify(tags));
+			};
+		}
+
+		// Send the request
+		let projectUrl = "http://localhost:8000/projects/";
+		fetch(projectUrl, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("session")}`,
+			},
+			body: formData,
+		})
+			.then((response) => {
+				console.log(response);
+				if (response.status === 200) {
+					showModal = false;
+					window.location.reload();
+				}
 			})
-				.then((response) => {
-					console.log(response);
-					if (response.status === 200) {
-						// showModal = false;
-						// window.location.reload();
-					}
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		};
+			.catch((error) => {
+				console.error(error);
+			});
 
 		if (fileField.files.length > 0) {
 			reader.readAsDataURL(fileField.files[0]);
@@ -203,7 +221,7 @@
 <Modal bind:showModal showCloseButton={false}>
 	<h2
 		slot="header"
-		class="text-2xl font-semibold mb-8 text-center text-black-600"
+		class="text-2xl font-semibold m-8 text-center text-black-600"
 	>
 		Create a new project
 	</h2>
@@ -266,6 +284,49 @@
 								<option value="inactive">Inactive</option>
 								<option value="active">Active</option>
 							</select>
+						</div>
+					{:else if header === "tor"}
+						<div class="mb-4">
+							<label
+								for={header}
+								class="block text-gray-600 font-semibold mb-2"
+							>
+								{header.charAt(0).toUpperCase() +
+									header.slice(1)}
+							</label>
+							<div class="flex items-center justify-between">
+								<input
+									bind:value={newTag}
+									type="text"
+									placeholder="Enter tag"
+									class="mr-2 border border-gray-300 rounded"
+								/>
+								<button
+									type="button"
+									class="bg-teal-500 text-white p-2 rounded-full hover:bg-teal-600 transition-all duration-500 flex items-center"
+									on:click={addTag}
+								>
+									<span class="material-icons"> add </span>
+								</button>
+							</div>
+							{#each tags as tag (tag)}
+								<div
+									class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex"
+								>
+									<span>{tag}</span>
+									<button
+										class="ml-2 bg-red-500 hover:bg-red-700 text-white rounded-full h-4 w-4 flex items-center justify-center"
+										on:click={() => removeTag(tag)}
+									>
+										<span
+											class="material-icons"
+											style="font-size: 14px;"
+										>
+											close
+										</span>
+									</button>
+								</div>
+							{/each}
 						</div>
 					{:else}
 						<div class="mb-4">
