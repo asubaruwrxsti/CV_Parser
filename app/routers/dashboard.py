@@ -17,10 +17,10 @@ async def dashboard(userId: str = Depends(get_current_user)):
         participants = json.loads(project['participants'])
         project['participants'] = len(participants[0])
 
-    # New Applicants
-    new_applicants = Database().query(f"SELECT * FROM applicants ORDER BY id DESC")
+    # New Experts
+    new_experts = Database().query(f"SELECT * FROM applicants ORDER BY id DESC")
 
     # All Projects
     all_projects = Database().query(f"SELECT * FROM projects")
 
-    return {"active_project": active_project, "new_applicants": new_applicants, "all_projects": all_projects}
+    return {"active_project": active_project, "new_experts": new_experts, "all_projects": all_projects}

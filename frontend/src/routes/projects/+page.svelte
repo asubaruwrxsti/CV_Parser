@@ -128,8 +128,7 @@
 			.then((response) => {
 				console.log(response);
 				if (response.status === 200) {
-					// showModal = false;
-					// window.location.reload();
+					window.location.reload();
 				}
 			})
 			.catch((error) => {
