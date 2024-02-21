@@ -41,10 +41,14 @@ async def create(request: Request):
 @router.put("/{project_id}")
 async def update(project_id: int, request: Request):
     try:
-        form_data = await request.form()
+        form_data = await request.json()
         updated_fields = {}
         for key in form_data.keys():
             updated_fields[key] = form_data[key]
+        
+        if not updated_fields:
+            return {"Error": "No fields to update"}
+
         await project.update_record(Database(), project_id, updated_fields)
         return {"Update": "project"}
     except Exception as e:

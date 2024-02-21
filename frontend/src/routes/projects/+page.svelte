@@ -8,6 +8,9 @@
 	import Modal from "../../components/Modal.svelte";
 	import { truncate, isJson } from "../../utils/utils";
 
+	// Hidden fields
+	let hiddenFields = ["id", "image"];
+
 	// Loading state
 	let isLoading = true;
 

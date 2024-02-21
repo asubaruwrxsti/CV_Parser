@@ -6,18 +6,67 @@
 	import { fade } from "svelte/transition";
 	import { checkSession } from "../../../services/sessionManager";
 	import { parseJsonValues } from "../../../utils/utils";
+	import Modal from "../../../components/Modal.svelte";
+	import { Body } from "svelte-body";
 
+	// Hidden fields
+	let hiddenFields = ["id", "image"];
+
+	// Data mapping
+	let dataMap = {
+		"tor": "tag",
+		"participants": "select",
+	};
+
+	// Project data
 	let isLoading = true;
 	let project: any = [];
 
+	// Modal state
+	let showModal = false;
+	$: bodyStyle = {
+		filter: showModal ? "blur(5px)" : "none",
+	};
+
+	// Editing
 	let editingKey: string | null = null;
 	let editedValue = "";
 	$: rows = Math.ceil(editedValue.length / 80);
 
+	function handleEdit(key: string) {
+		console.log(`Editing ${key}`);
+		editingKey = key;
+		editedValue = project[key];
+	}
+
+	async function handleSave(key: string) {
+		console.log(`Saving ${key}`);
+		if (editingKey === key) {
+			// Save logic here
+			fetch(`http://localhost:8000/projects/${project.id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("session")}`,
+				},
+				body: JSON.stringify({
+					[key]: editedValue,
+				}),
+			})
+				.then((response) => {
+					if (response.status === 200) {
+						window.location.reload();
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	}
+
 	onMount(async () => {
 		try {
-			let projectUrl =
-				"http://localhost:8000/projects/" + data.props.data.id;
+			let projectUrl = `http://localhost:8000/projects/${data.props.data.id}`;
 			let response = await fetch(projectUrl, {
 				method: "GET",
 				headers: {
@@ -25,7 +74,6 @@
 				},
 			});
 			project = await response.json().then((data) => {
-				// If the image data is in base64 format, decode it
 				if (data.image) {
 					data.image = "data:image/jpeg;base64," + data.image;
 				}
@@ -77,26 +125,20 @@
 								{key.charAt(0).toUpperCase() + key.slice(1)}:
 							</strong>
 							{#each project[key] as item, index (index)}
-								{#if typeof item === "object" && item !== null && !Array.isArray(item)}
-									<div
-										class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
-									>
-										<span>
-											{item.label}
-										</span>
-									</div>
-								{:else}
-									<div
-										class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
-									>
-										<span>
-											{item}
-										</span>
-									</div>
-								{/if}
+								<div
+									class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+								>
+									<span>
+										{typeof item === "object" &&
+										item !== null &&
+										!Array.isArray(item)
+											? item.label
+											: item}
+									</span>
+								</div>
 							{/each}
 						</div>
-					{:else if key !== "id" && key !== "image"}
+					{:else if !hiddenFields.includes(key)}
 						<hr class="my-4" />
 						<div
 							class="flex items-center relative group hover:bg-gray-300 rounded-lg p-2 transition-all duration-400"
@@ -108,9 +150,6 @@
 								<textarea
 									bind:value={editedValue}
 									class="text-lg text-gray-600 flex-grow rounded-lg pr-5"
-									on:blur={() => {
-										editingKey = null;
-									}}
 									on:introend={() => {
 										project[key] = editedValue;
 									}}
@@ -123,20 +162,31 @@
 									{project[key]}
 								</p>
 							{/if}
-							<button
-								class="material-icons absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1"
-								on:click={() => {
-									editingKey =
-										editingKey === key ? null : key;
-									editedValue = project[key];
-								}}
-							>
-								{#if editingKey === key}
-									save
-								{:else}
+							{#if editingKey === key}
+								<div
+									class="flex space-x-2 absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1"
+								>
+									<button
+										class="material-icons"
+										on:click={() => handleSave(key)}
+									>
+										save
+									</button>
+									<button
+										class="material-icons"
+										on:click={() => (editingKey = null)}
+									>
+										cancel
+									</button>
+								</div>
+							{:else}
+								<button
+									class="material-icons absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1"
+									on:click={() => handleEdit(key)}
+								>
 									edit
-								{/if}
-							</button>
+								</button>
+							{/if}
 						</div>
 					{/if}
 				{/each}
@@ -165,3 +215,7 @@
 		</div>
 	</div>
 {/if}
+
+<Body style={bodyStyle} />
+
+<Modal bind:showModal showCloseButton={false}></Modal>
