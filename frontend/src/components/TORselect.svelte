@@ -1,7 +1,12 @@
 <script lang="ts">
 	export let header: string;
-	export let tags: string[] = [];
-	export let newTag = "";
+	export let data: {
+		value: {
+			tags: string[];
+		};
+	};
+	export let tags: string[] = data.value.tags;
+	let newTag = "";
 
 	function addTag() {
 		if (newTag) {

@@ -275,7 +275,7 @@
 							</select>
 						</div>
 					{:else if header === "tor"}
-						<ToRselect {header} {tags} {newTag} />
+						<ToRselect {header} data={{ value: { tags: [] } }} />
 					{:else}
 						<div class="mb-4">
 							<label

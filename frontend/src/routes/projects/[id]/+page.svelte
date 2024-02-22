@@ -18,6 +18,9 @@
 	let isLoading = true;
 	let project: any = [];
 
+	// TOR
+	let tags: string[] = [];
+
 	// Modal state
 	let showModal = false;
 	let modalData = {
@@ -66,7 +69,7 @@
 			title: "Edit Participants",
 			body: {
 				key,
-				value: project[key]
+				value: project[key],
 			},
 			relatedComponent: "ParticipantsSelect",
 		};
@@ -199,7 +202,7 @@
 							</strong>
 							{#each project[key] as item, index (index)}
 								<div
-									class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+									class="tag mt-2 bg-teal-200 rounded p-2 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
 								>
 									<span>
 										{typeof item === "object" &&
@@ -211,12 +214,12 @@
 								</div>
 							{/each}
 							<button
-								class="absolute right-0 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600"
+								class="absolute right-0 mr-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600"
 								on:click={() => handleEdit(key)}
 							>
 								<!-- Replace with your Material icon -->
 								<i
-									class="material-icons hover:bg-black rounded-full p-1 transition-all duration-300 hover:text-white"
+									class="material-icons hover:bg-black rounded-full p-1 transition-all duration-300 hover:text-white mt-2"
 									>edit</i
 								>
 							</button>
@@ -240,7 +243,7 @@
 								/>
 							{:else}
 								<p
-									class="text-lg text-gray-600 flex-grow rounded-lg pr-5"
+									class="text-lg text-gray-600 flex-grow rounded-lg p-2"
 								>
 									{project[key]}
 								</p>
