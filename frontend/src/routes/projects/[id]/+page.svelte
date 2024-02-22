@@ -8,6 +8,8 @@
 	import { parseJsonValues } from "../../../utils/utils";
 	import Modal from "../../../components/Modal.svelte";
 	import { Body } from "svelte-body";
+	import ParticipantsSelect from "../../../components/ParticipantsSelect.svelte";
+	import ToRselect from "../../../components/TORselect.svelte";
 
 	// Hidden fields
 	let hiddenFields = ["id", "image"];
@@ -18,6 +20,11 @@
 
 	// Modal state
 	let showModal = false;
+	let modalData = {
+		title: "",
+		body: {},
+		relatedComponent: "",
+	};
 	$: bodyStyle = {
 		filter: showModal ? "blur(5px)" : "none",
 	};
@@ -27,11 +34,18 @@
 	let editedValue = "";
 	$: rows = Math.ceil(editedValue.length / 80);
 
+	// Edit types
 	let editTypes = {
 		tor: handleEditTOR,
 		participants: handleEditParticipants,
-		image: handleEditImage,
-		status: handleEditStatus,
+		// image: handleEditImage,
+		// status: handleEditStatus,
+	};
+
+	// Components
+	let components: { [key: string]: any } = {
+		ParticipantsSelect,
+		// other components here
 	};
 
 	function handleEdit(key: string) {
@@ -46,21 +60,56 @@
 		editedValue = project[key];
 	}
 
-	function handleEditTOR(key: string) {
-		console.log(`Editing ${key}`);
-	}
-
 	function handleEditParticipants(key: string) {
 		console.log(`Editing ${key}`);
+		modalData = {
+			title: "Edit Participants",
+			body: {
+				key,
+				value: project[key]
+			},
+			relatedComponent: "ParticipantsSelect",
+		};
+		console.log(modalData);
+		showModal = true;
 	}
 
-	function handleEditImage(key: string) {
+	function handleEditTOR(key: string) {
 		console.log(`Editing ${key}`);
+		modalData = {
+			title: "Edit Terms of Reference",
+			body: {
+				key,
+				value: project[key],
+			},
+			relatedComponent: "ToRselect",
+		};
+		showModal = true;
 	}
 
-	function handleEditStatus(key: string) {
-		console.log(`Editing ${key}`);
-	}
+	// function handleEditImage(key: string) {
+	// 	console.log(`Editing ${key}`);
+	// 	modalData = {
+	// 		title: "Edit Image",
+	// 		body: {
+	// 			key,
+	// 			value: project[key],
+	// 		},
+	// 	};
+	// 	showModal = true;
+	// }
+
+	// function handleEditStatus(key: string) {
+	// 	console.log(`Editing ${key}`);
+	// 	modalData = {
+	// 		title: "Edit Status",
+	// 		body: {
+	// 			key,
+	// 			value: project[key],
+	// 		},
+	// 	};
+	// 	showModal = true;
+	// }
 
 	async function handleSave(key: string) {
 		if (editingKey === key) {
@@ -262,4 +311,23 @@
 
 <Body style={bodyStyle} />
 
-<Modal bind:showModal showCloseButton={false}></Modal>
+<Modal bind:showModal showCloseButton={false}>
+	<h2
+		slot="header"
+		class="text-2xl font-semibold m-8 text-center text-black-600"
+	>
+		{modalData.title}
+	</h2>
+	<div
+		slot="body"
+		class="w-full mb-8 mt-8 p-4 bg-gray-100 rounded shadow"
+		style="width: 400px"
+	>
+		<svelte:component
+			this={components[modalData.relatedComponent]}
+			header="Select Participants"
+			data={modalData.body}
+			showSaveButton={true}
+		/>
+	</div>
+</Modal>

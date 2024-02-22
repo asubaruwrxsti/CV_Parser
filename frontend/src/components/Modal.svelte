@@ -16,13 +16,15 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click|stopPropagation>
         <slot name="header" />
+		<hr class="my-4" />
         <slot name="body" />
         <!-- svelte-ignore a11y-autofocus -->
         {#if showCloseButton}
+		<hr class="my-4" />
             <button
                 autofocus
                 on:click={() => dialog.close()}
-                class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out"
+                class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out w-full"
             >
                 Close
             </button>

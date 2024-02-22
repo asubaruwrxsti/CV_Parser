@@ -4,12 +4,10 @@
 	import { checkSession } from "../../services/sessionManager";
 	import { browser } from "$app/environment";
 	import { Body } from "svelte-body";
-	import Select from "svelte-select";
 	import Modal from "../../components/Modal.svelte";
+	import ParticipantsSelect from "../../components/ParticipantsSelect.svelte";
+	import ToRselect from "../../components/TORselect.svelte";
 	import { truncate, isJson } from "../../utils/utils";
-
-	// Hidden fields
-	let hiddenFields = ["id", "image"];
 
 	// Loading state
 	let isLoading = true;
@@ -27,17 +25,6 @@
 	// TOR tags
 	let tags: string[] = [];
 	let newTag = "";
-
-	function addTag() {
-		if (newTag) {
-			tags = [...tags, newTag];
-			newTag = "";
-		}
-	}
-
-	function removeTag(tagToRemove: string) {
-		tags = tags.filter((tag) => tag !== tagToRemove);
-	}
 
 	// Modal status state
 	let status = "inactive";
@@ -61,25 +48,6 @@
 			console.log(error);
 		}
 	});
-
-	// Load options for the select component
-	async function loadOptions(name: string) {
-		let applicantUrl = `http://localhost:8000/participants/search`;
-		let response = await fetch(applicantUrl, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("session")}`,
-			},
-			body: JSON.stringify({ name: name }),
-		});
-		let data = await response.json();
-		return data.map((applicant: any) => {
-			return {
-				value: applicant.id,
-				label: applicant.name,
-			};
-		});
-	}
 
 	// Create a new project submission
 	async function createProject(event: any) {
@@ -211,7 +179,10 @@
 													<div
 														class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
 													>
-														<span>{tag.label || tag}</span>
+														<span
+															>{tag.label ||
+																tag}</span
+														>
 													</div>
 												{/each}
 												{#if JSON.parse(project[header]).length > 3}
@@ -265,19 +236,7 @@
 			{#each headers as header}
 				{#if header !== "id"}
 					{#if header === "participants"}
-						<div class="mb-4">
-							<label
-								for={header}
-								class="block text-gray-600 font-semibold mb-2"
-								>{header.charAt(0).toUpperCase() +
-									header.slice(1)}</label
-							>
-							<Select
-								{loadOptions}
-								multiple={true}
-								name={header}
-							/>
-						</div>
+						<ParticipantsSelect {header} data={{ value: [] }} />
 					{:else if header === "image"}
 						<div class="mb-4">
 							<label
@@ -316,48 +275,7 @@
 							</select>
 						</div>
 					{:else if header === "tor"}
-						<div class="mb-4">
-							<label
-								for={header}
-								class="block text-gray-600 font-semibold mb-2"
-							>
-								{header.charAt(0).toUpperCase() +
-									header.slice(1)}
-							</label>
-							<div class="flex items-center justify-between">
-								<input
-									bind:value={newTag}
-									type="text"
-									placeholder="Enter tag"
-									class="mr-2 border border-gray-300 rounded"
-								/>
-								<button
-									type="button"
-									class="bg-teal-500 text-white p-2 rounded-full hover:bg-teal-600 transition-all duration-500 flex items-center"
-									on:click={addTag}
-								>
-									<span class="material-icons"> add </span>
-								</button>
-							</div>
-							{#each tags as tag (tag)}
-								<div
-									class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex"
-								>
-									<span>{tag}</span>
-									<button
-										class="ml-2 bg-red-500 hover:bg-red-700 text-white rounded-full h-4 w-4 flex items-center justify-center"
-										on:click={() => removeTag(tag)}
-									>
-										<span
-											class="material-icons"
-											style="font-size: 14px;"
-										>
-											close
-										</span>
-									</button>
-								</div>
-							{/each}
-						</div>
+						<ToRselect {header} {tags} {newTag} />
 					{:else}
 						<div class="mb-4">
 							<label
