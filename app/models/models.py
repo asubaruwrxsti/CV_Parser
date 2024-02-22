@@ -27,15 +27,13 @@ class Users(TableRecord):
         'username': None,
         'password': None,
         'email': None,
-        'projects': None,
-        'group_id': None,
+        'settings': None,
     }
     field_types: Dict[str, str] = {
         'username': 'VARCHAR(255)',
         'password': 'VARCHAR(255)',
         'email': 'VARCHAR(255)',
-        'projects': 'VARCHAR(255)',
-        'group_id': 'VARCHAR(255)',
+        'settings': 'TEXT',
     }
 
 class Project(TableRecord):
@@ -75,13 +73,13 @@ class Applicants(TableRecord):
     table_name: str = 'applicants'
     fields: Dict[str, str] = {
         'name': None,
+        'phone': None,
+        'email': None,
         'cv_id': None,
-        'status': None,
-        'project_id': None
     }
     field_types: Dict[str, str] = {
         'name': 'VARCHAR(255)',
+        'phone': 'VARCHAR(255)',
+        'email': 'VARCHAR(255)',
         'cv_id': 'VARCHAR(255)',
-        'status': 'VARCHAR(255)',
-        'project_id': 'VARCHAR(255)'
     }

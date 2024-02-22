@@ -23,6 +23,7 @@ export async function checkSession() {
         },
     });
 
+	// TODO: Handle session expire better
     if (res.status === 200) {
         return true;
     } else {
