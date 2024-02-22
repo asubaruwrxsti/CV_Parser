@@ -12,12 +12,6 @@
 	// Hidden fields
 	let hiddenFields = ["id", "image"];
 
-	// Data mapping
-	let dataMap = {
-		"tor": "tag",
-		"participants": "select",
-	};
-
 	// Project data
 	let isLoading = true;
 	let project: any = [];
@@ -33,14 +27,42 @@
 	let editedValue = "";
 	$: rows = Math.ceil(editedValue.length / 80);
 
+	let editTypes = {
+		tor: handleEditTOR,
+		participants: handleEditParticipants,
+		image: handleEditImage,
+		status: handleEditStatus,
+	};
+
 	function handleEdit(key: string) {
-		console.log(`Editing ${key}`);
+		// Custom edit
+		if (key in editTypes) {
+			(editTypes as { [key: string]: (key: string) => void })[key](key);
+			return;
+		}
+
+		// Default edit
 		editingKey = key;
 		editedValue = project[key];
 	}
 
+	function handleEditTOR(key: string) {
+		console.log(`Editing ${key}`);
+	}
+
+	function handleEditParticipants(key: string) {
+		console.log(`Editing ${key}`);
+	}
+
+	function handleEditImage(key: string) {
+		console.log(`Editing ${key}`);
+	}
+
+	function handleEditStatus(key: string) {
+		console.log(`Editing ${key}`);
+	}
+
 	async function handleSave(key: string) {
-		console.log(`Saving ${key}`);
 		if (editingKey === key) {
 			// Save logic here
 			fetch(`http://localhost:8000/projects/${project.id}`, {
@@ -118,7 +140,9 @@
 				{#each Object.keys(project) as key (key)}
 					{#if Array.isArray(project[key])}
 						<hr class="my-4" />
-						<div class="flex items-center">
+						<div
+							class="flex items-center relative group hover:bg-gray-300 rounded-lg p-2 transition-all duration-400"
+						>
 							<strong
 								class="mr-16 flex-grow-0 flex-shrink-0 w-24"
 							>
@@ -137,6 +161,16 @@
 									</span>
 								</div>
 							{/each}
+							<button
+								class="absolute right-0 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600"
+								on:click={() => handleEdit(key)}
+							>
+								<!-- Replace with your Material icon -->
+								<i
+									class="material-icons hover:bg-black rounded-full p-1 transition-all duration-300 hover:text-white"
+									>edit</i
+								>
+							</button>
 						</div>
 					{:else if !hiddenFields.includes(key)}
 						<hr class="my-4" />
@@ -164,16 +198,16 @@
 							{/if}
 							{#if editingKey === key}
 								<div
-									class="flex space-x-2 absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1"
+									class="flex space-x-2 absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform"
 								>
 									<button
-										class="material-icons"
+										class="material-icons hover:bg-black hover:text-white rounded-full p-2 transition-all duration-300 text-gray-600"
 										on:click={() => handleSave(key)}
 									>
 										save
 									</button>
 									<button
-										class="material-icons"
+										class="material-icons hover:bg-black hover:text-white rounded-full p-2 transition-all duration-300 text-gray-600"
 										on:click={() => (editingKey = null)}
 									>
 										cancel
@@ -181,7 +215,7 @@
 								</div>
 							{:else}
 								<button
-									class="material-icons absolute right-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-200 transform group-hover:-translate-y-1"
+									class="material-icons mr-5 absolute right-0 opacity-0 p-2 group-hover:opacity-100 transition-all duration-300 transform hover:bg-black hover:text-white rounded-full text-gray-600"
 									on:click={() => handleEdit(key)}
 								>
 									edit
@@ -193,23 +227,33 @@
 			</div>
 			{#each Object.keys(project) as key (key)}
 				{#if key === "image"}
-					{#if project[key] !== null}
-						<div class="w-1/3 ml-16">
+					<div
+						class="w-1/3 ml-16 relative group flex justify-center items-start"
+					>
+						<div class="relative group">
 							<img
-								class="w-full h-auto shadow-2xl scale-105 rounded-lg"
-								src={project[key]}
+								class="w-full h-auto shadow-2xl scale-105 rounded-lg blur-on-hover"
+								src={project[key] !== null
+									? project[key]
+									: "/No-Image-Placeholder.svg.png"}
 								alt={key}
 							/>
+							<div
+								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+								on:click={() => handleEdit(key)}
+								on:keydown={(event) => {
+									if (event.key === "Enter") handleEdit(key);
+								}}
+								tabindex="0"
+								role="button"
+							>
+								<button
+									class="material-icons m-0 p-0 opacity-0 p-5 group-hover:opacity-100 transition-all duration-300 transform hover:bg-black hover:text-white rounded-full text-gray-600 text-6xl"
+									>edit</button
+								>
+							</div>
 						</div>
-					{:else}
-						<div class="w-1/3 ml-16">
-							<img
-								class="w-full h-auto shadow-2xl scale-105 rounded-lg"
-								src="/No-Image-Placeholder.svg.png"
-								alt={key}
-							/>
-						</div>
-					{/if}
+					</div>
 				{/if}
 			{/each}
 		</div>
