@@ -9,7 +9,7 @@
 	import Modal from "../../../components/Modal.svelte";
 	import { Body } from "svelte-body";
 	import ParticipantsSelect from "../../../components/ParticipantsSelect.svelte";
-	import ToRselect from "../../../components/TORselect.svelte";
+	import TorEdit from "../../../components/TOREdit.svelte";
 
 	// Hidden fields
 	let hiddenFields = ["id", "image"];
@@ -17,9 +17,6 @@
 	// Project data
 	let isLoading = true;
 	let project: any = [];
-
-	// TOR
-	let tags: string[] = [];
 
 	// Modal state
 	let showModal = false;
@@ -48,6 +45,7 @@
 	// Components
 	let components: { [key: string]: any } = {
 		ParticipantsSelect,
+		TorEdit,
 		// other components here
 	};
 
@@ -85,7 +83,7 @@
 				key,
 				value: project[key],
 			},
-			relatedComponent: "ToRselect",
+			relatedComponent: "TorEdit",
 		};
 		showModal = true;
 	}
@@ -328,7 +326,7 @@
 	>
 		<svelte:component
 			this={components[modalData.relatedComponent]}
-			header="Select Participants"
+			header={modalData.title}
 			data={modalData.body}
 			showSaveButton={true}
 		/>

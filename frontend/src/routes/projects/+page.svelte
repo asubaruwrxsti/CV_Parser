@@ -24,7 +24,9 @@
 
 	// TOR tags
 	let tags: string[] = [];
-	let newTag = "";
+	function handleTagsUpdated(event: CustomEvent) {
+		tags = event.detail;
+	}
 
 	// Modal status state
 	let status = "inactive";
@@ -88,23 +90,23 @@
 			console.log(key, value);
 		}
 
-		let projectUrl = "http://localhost:8000/projects/";
-		fetch(projectUrl, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("session")}`,
-			},
-			body: formData,
-		})
-			.then((response) => {
-				console.log(response);
-				if (response.status === 200) {
-					window.location.reload();
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		// let projectUrl = "http://localhost:8000/projects/";
+		// fetch(projectUrl, {
+		// 	method: "POST",
+		// 	headers: {
+		// 		Authorization: `Bearer ${localStorage.getItem("session")}`,
+		// 	},
+		// 	body: formData,
+		// })
+		// 	.then((response) => {
+		// 		console.log(response);
+		// 		if (response.status === 200) {
+		// 			window.location.reload();
+		// 		}
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error(error);
+		// 	});
 	}
 
 	if (browser) {
@@ -275,7 +277,7 @@
 							</select>
 						</div>
 					{:else if header === "tor"}
-						<ToRselect {header} data={{ value: { tags: [] } }} />
+						<ToRselect {header} data={{ value: { tags } }} on:tagsUpdated={handleTagsUpdated} />
 					{:else}
 						<div class="mb-4">
 							<label

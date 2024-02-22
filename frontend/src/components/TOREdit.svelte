@@ -4,12 +4,11 @@
 
 	export let header: string;
 	export let data: {
-		value: {
-			tags: string[];
-		};
+		value: string[];
 	};
+	export let showSaveButton: boolean = false;
 
-	export let tags: string[] = data.value.tags;
+	let tags: string[] = data.value || [];
 	let newTag = "";
 
 	function addTag() {
@@ -61,3 +60,10 @@
 		</div>
 	{/each}
 </div>
+{#if showSaveButton}
+	<button
+		class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out w-full"
+	>
+		Save
+	</button>
+{/if}
