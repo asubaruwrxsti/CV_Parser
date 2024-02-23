@@ -1,13 +1,19 @@
 <script lang="ts">
 	/** @type {import('./$types').PageData} */
 	export let data: any;
+	console.log(data);
+
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import { fade } from "svelte/transition";
 	import { checkSession } from "../../../services/sessionManager";
 	import { parseJsonValues } from "../../../utils/utils";
-	import Modal from "../../../components/Modal.svelte";
+	import { fetchData, postData } from "../../../services/dataManager";
+	import type { ModalData } from "../../../interfaces/Interfaces";
+
 	import { Body } from "svelte-body";
+
+	import Modal from "../../../components/Modal.svelte";
 	import ParticipantsSelect from "../../../components/ParticipantsSelect.svelte";
 	import TorEdit from "../../../components/TOREdit.svelte";
 	import ImageEdit from "../../../components/ImageEdit.svelte";
@@ -22,9 +28,12 @@
 
 	// Modal state
 	let showModal = false;
-	let modalData = {
+	let modalData: ModalData = {
 		title: "",
-		body: {},
+		body: {
+			key: "",
+			value: "",
+		},
 		relatedComponent: "",
 	};
 	$: bodyStyle = {
@@ -34,17 +43,12 @@
 	// Editing
 	let editingKey: string | null = null;
 	let editedValue = "";
+	type EditType = {
+		title: string;
+		component: string;
+	};
 	$: rows = Math.ceil(editedValue.length / 80);
 
-	// Edit types
-	let editTypes = {
-		tor: handleEditTOR,
-		participants: handleEditParticipants,
-		image: handleEditImage,
-		status: handleEditStatus,
-	};
-
-	// Components
 	let components: { [key: string]: any } = {
 		ParticipantsSelect,
 		TorEdit,
@@ -52,114 +56,54 @@
 		StatusEdit,
 	};
 
-	function handleEdit(key: string) {
-		// Custom edit
-		if (key in editTypes) {
-			(editTypes as { [key: string]: (key: string) => void })[key](key);
-			return;
-		}
+	const editTypes: Record<string, EditType> = {
+		tor: { title: "Terms of Reference", component: "TorEdit" },
+		participants: {
+			title: "Participants",
+			component: "ParticipantsSelect",
+		},
+		image: { title: "Image", component: "ImageEdit" },
+		status: { title: "Status", component: "StatusEdit" },
+	};
 
-		// Default edit
+	function startEditing(key: string) {
+		if (key in editTypes) {
+			startCustomEdit(key, editTypes[key]);
+		} else {
+			startDefaultEdit(key);
+		}
+	}
+
+	function startCustomEdit(key: string, editType: EditType) {
+		console.log(`Editing ${key}`);
+		modalData = {
+			title: editType.title,
+			body: {
+				key,
+				value: project[key],
+			},
+			relatedComponent: editType.component,
+		};
+		showModal = true;
+	}
+
+	function startDefaultEdit(key: string) {
 		editingKey = key;
 		editedValue = project[key];
 	}
 
-	function handleEditParticipants(key: string) {
-		console.log(`Editing ${key}`);
-		modalData = {
-			title: "Participants",
-			body: {
-				key,
-				value: project[key],
-			},
-			relatedComponent: "ParticipantsSelect",
-		};
-		console.log(modalData);
-		showModal = true;
-	}
-
-	function handleEditTOR(key: string) {
-		console.log(`Editing ${key}`);
-		modalData = {
-			title: "Terms of Reference",
-			body: {
-				key,
-				value: project[key],
-			},
-			relatedComponent: "TorEdit",
-		};
-		showModal = true;
-	}
-
-	function handleEditImage(key: string) {
-		console.log(`Editing ${key}`);
-		modalData = {
-			title: "Image",
-			body: {
-				key,
-				value: project[key],
-			},
-			relatedComponent: "ImageEdit",
-		};
-		showModal = true;
-	}
-
-	function handleEditStatus(key: string) {
-		console.log(`Editing ${key}`);
-		modalData = {
-			title: "Status",
-			body: {
-				key,
-				value: project[key],
-			},
-			relatedComponent: "StatusEdit",
-		};
-		showModal = true;
-	}
-
-	async function handleSave(key: string) {
-		if (editingKey === key) {
-			// Save logic here
-			fetch(`http://localhost:8000/projects/${project.id}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("session")}`,
-				},
-				body: JSON.stringify({
-					[key]: editedValue,
-				}),
-			})
-				.then((response) => {
-					if (response.status === 200) {
-						window.location.reload();
-					}
-				})
-				.catch((error) => {
-					console.log(error);
-				});
-		}
-	}
-
 	onMount(async () => {
 		try {
-			let projectUrl = `http://localhost:8000/projects/${data.props.data.id}`;
-			let response = await fetch(projectUrl, {
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("session")}`,
+			project = await fetchData("projects", data.props.data.id).then(
+				(res) => {
+					if (res.image) {
+						res.image = "data:image/jpeg;base64," + res.image;
+					}
+					return parseJsonValues(res);
 				},
-			});
-			project = await response.json().then((data) => {
-				if (data.image) {
-					data.image = "data:image/jpeg;base64," + data.image;
-				}
-				data = parseJsonValues(data);
-				console.log(data);
-				return data;
-			});
+			);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	});
 
@@ -218,7 +162,7 @@
 							{/each}
 							<button
 								class="absolute right-0 mr-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600"
-								on:click={() => handleEdit(key)}
+								on:click={() => startEditing(key)}
 							>
 								<!-- Replace with your Material icon -->
 								<i
@@ -257,7 +201,14 @@
 								>
 									<button
 										class="material-icons hover:bg-black hover:text-white rounded-full p-2 transition-all duration-300 text-gray-600"
-										on:click={() => handleSave(key)}
+										on:click={() =>
+											postData(
+												"projects",
+												data.props.data.id,
+												JSON.stringify({
+													[key]: editedValue,
+												}),
+											)}
 									>
 										save
 									</button>
@@ -271,7 +222,7 @@
 							{:else}
 								<button
 									class="material-icons mr-5 absolute right-0 opacity-0 p-2 group-hover:opacity-100 transition-all duration-300 transform hover:bg-black hover:text-white rounded-full text-gray-600"
-									on:click={() => handleEdit(key)}
+									on:click={() => startEditing(key)}
 								>
 									edit
 								</button>
@@ -295,9 +246,9 @@
 							/>
 							<div
 								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-								on:click={() => handleEdit(key)}
+								on:click={() => startEditing(key)}
 								on:keydown={(event) => {
-									if (event.key === "Enter") handleEdit(key);
+									if (event.key === "Enter") startEditing(key);
 								}}
 								tabindex="0"
 								role="button"
