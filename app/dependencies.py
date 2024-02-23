@@ -1,5 +1,6 @@
 from .db import Database as BaseDatabase
-from app.services.service import Redis
+# TODO: Fix Redis import
+# from app.services.service import Redis
 from fastapi import Header, HTTPException
 from typing import Annotated
 from app.utils.helperFunctions import loadEnv
@@ -31,5 +32,5 @@ def get_current_user(Authorization: Annotated[str | None, Header()] = None):
     try:
         return jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["id"]
     except:
-        Redis().delete_from_redis(jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["session_id"])
+        # Redis().delete_from_redis(jwt.decode(Authorization, "secret", algorithms=["HS256"])["data"]["session_id"])
         raise HTTPException(status_code=400, detail="Invalid token")

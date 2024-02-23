@@ -23,4 +23,6 @@ async def dashboard(userId: str = Depends(get_current_user)):
     # All Projects
     all_projects = Database().query(f"SELECT * FROM projects")
 
+	# TODO: Limit active project to 1, and its attributes to 3 and show ... if more
+    # Espeically TOR
     return {"active_project": active_project, "new_experts": new_experts, "all_projects": all_projects}

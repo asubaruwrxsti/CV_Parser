@@ -10,6 +10,8 @@
 	import { Body } from "svelte-body";
 	import ParticipantsSelect from "../../../components/ParticipantsSelect.svelte";
 	import TorEdit from "../../../components/TOREdit.svelte";
+	import ImageEdit from "../../../components/ImageEdit.svelte";
+	import StatusEdit from "../../../components/StatusEdit.svelte";
 
 	// Hidden fields
 	let hiddenFields = ["id", "image"];
@@ -38,15 +40,16 @@
 	let editTypes = {
 		tor: handleEditTOR,
 		participants: handleEditParticipants,
-		// image: handleEditImage,
-		// status: handleEditStatus,
+		image: handleEditImage,
+		status: handleEditStatus,
 	};
 
 	// Components
 	let components: { [key: string]: any } = {
 		ParticipantsSelect,
 		TorEdit,
-		// other components here
+		ImageEdit,
+		StatusEdit,
 	};
 
 	function handleEdit(key: string) {
@@ -64,7 +67,7 @@
 	function handleEditParticipants(key: string) {
 		console.log(`Editing ${key}`);
 		modalData = {
-			title: "Edit Participants",
+			title: "Participants",
 			body: {
 				key,
 				value: project[key],
@@ -78,7 +81,7 @@
 	function handleEditTOR(key: string) {
 		console.log(`Editing ${key}`);
 		modalData = {
-			title: "Edit Terms of Reference",
+			title: "Terms of Reference",
 			body: {
 				key,
 				value: project[key],
@@ -88,29 +91,31 @@
 		showModal = true;
 	}
 
-	// function handleEditImage(key: string) {
-	// 	console.log(`Editing ${key}`);
-	// 	modalData = {
-	// 		title: "Edit Image",
-	// 		body: {
-	// 			key,
-	// 			value: project[key],
-	// 		},
-	// 	};
-	// 	showModal = true;
-	// }
+	function handleEditImage(key: string) {
+		console.log(`Editing ${key}`);
+		modalData = {
+			title: "Image",
+			body: {
+				key,
+				value: project[key],
+			},
+			relatedComponent: "ImageEdit",
+		};
+		showModal = true;
+	}
 
-	// function handleEditStatus(key: string) {
-	// 	console.log(`Editing ${key}`);
-	// 	modalData = {
-	// 		title: "Edit Status",
-	// 		body: {
-	// 			key,
-	// 			value: project[key],
-	// 		},
-	// 	};
-	// 	showModal = true;
-	// }
+	function handleEditStatus(key: string) {
+		console.log(`Editing ${key}`);
+		modalData = {
+			title: "Status",
+			body: {
+				key,
+				value: project[key],
+			},
+			relatedComponent: "StatusEdit",
+		};
+		showModal = true;
+	}
 
 	async function handleSave(key: string) {
 		if (editingKey === key) {
@@ -317,7 +322,7 @@
 		slot="header"
 		class="text-2xl font-semibold m-8 text-center text-black-600"
 	>
-		{modalData.title}
+		Edit {modalData.title}
 	</h2>
 	<div
 		slot="body"

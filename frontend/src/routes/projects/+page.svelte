@@ -4,10 +4,13 @@
 	import { checkSession } from "../../services/sessionManager";
 	import { browser } from "$app/environment";
 	import { Body } from "svelte-body";
+	import { truncate, isJson } from "../../utils/utils";
+
 	import Modal from "../../components/Modal.svelte";
 	import ParticipantsSelect from "../../components/ParticipantsSelect.svelte";
 	import ToRselect from "../../components/TORselect.svelte";
-	import { truncate, isJson } from "../../utils/utils";
+	import StatusEdit from "../../components/StatusEdit.svelte";
+	import ImageEdit from "../../components/ImageEdit.svelte";
 
 	// Loading state
 	let isLoading = true;
@@ -24,9 +27,6 @@
 
 	// TOR tags
 	let tags: string[] = [];
-	function handleTagsUpdated(event: CustomEvent) {
-		tags = event.detail;
-	}
 
 	// Modal status state
 	let status = "inactive";
@@ -90,23 +90,23 @@
 			console.log(key, value);
 		}
 
-		// let projectUrl = "http://localhost:8000/projects/";
-		// fetch(projectUrl, {
-		// 	method: "POST",
-		// 	headers: {
-		// 		Authorization: `Bearer ${localStorage.getItem("session")}`,
-		// 	},
-		// 	body: formData,
-		// })
-		// 	.then((response) => {
-		// 		console.log(response);
-		// 		if (response.status === 200) {
-		// 			window.location.reload();
-		// 		}
-		// 	})
-		// 	.catch((error) => {
-		// 		console.error(error);
-		// 	});
+		let projectUrl = "http://localhost:8000/projects/";
+		fetch(projectUrl, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("session")}`,
+			},
+			body: formData,
+		})
+			.then((response) => {
+				console.log(response);
+				if (response.status === 200) {
+					window.location.reload();
+				}
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	}
 
 	if (browser) {
@@ -240,44 +240,23 @@
 					{#if header === "participants"}
 						<ParticipantsSelect {header} data={{ value: [] }} />
 					{:else if header === "image"}
-						<div class="mb-4">
-							<label
-								for={header}
-								class="block text-gray-600 font-semibold mb-2"
-								>{header.charAt(0).toUpperCase() +
-									header.slice(1)}</label
-							>
-							<input
-								type="file"
-								id={header}
-								name={header}
-								class="w-full p-10 border border-gray-300 rounded-xl"
-							/>
-						</div>
+						<ImageEdit
+							{header}
+							data={{ projectID: "" }}
+							showSaveButton={false}
+						/>
 					{:else if header === "status"}
-						<div class="mb-4">
-							<label
-								for={header}
-								class="block text-gray-600 font-semibold mb-2 {status ===
-								'active'
-									? 'text-green-500'
-									: 'text-red-500'}"
-							>
-								{header.charAt(0).toUpperCase() +
-									header.slice(1)}
-							</label>
-							<select
-								bind:value={status}
-								id={header}
-								name={header}
-								class="w-full p-2 border border-gray-300 rounded"
-							>
-								<option value="inactive">Inactive</option>
-								<option value="active">Active</option>
-							</select>
-						</div>
+						<StatusEdit
+							{header}
+							data={{ status }}
+							showSaveButton={false}
+						/>
 					{:else if header === "tor"}
-						<ToRselect {header} data={{ value: { tags } }} on:tagsUpdated={handleTagsUpdated} />
+						<ToRselect
+							{header}
+							data={{ value: { tags } }}
+							on:tagsUpdated={(event) => (tags = event.detail)}
+						/>
 					{:else}
 						<div class="mb-4">
 							<label
