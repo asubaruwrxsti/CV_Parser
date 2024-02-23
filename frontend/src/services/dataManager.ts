@@ -10,9 +10,9 @@ export async function fetchData(property: string, id: number | string = "") {
 	return response.json();
 }
 
-export function postData(property: string, id: number | string = "", data: any) {
+export function postData(property: string, id: number | string = "", data: any, type: string = "POST") {
 	return fetch(`http://localhost:8000/${property}/${id}`, {
-		method: "PUT",
+		method: type,
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${localStorage.getItem("session")}`,

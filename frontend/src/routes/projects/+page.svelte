@@ -5,6 +5,7 @@
 	import { browser } from "$app/environment";
 	import { Body } from "svelte-body";
 	import { truncate, isJson } from "../../utils/utils";
+	import { fetchData, postData } from "../../services/dataManager";
 
 	import Modal from "../../components/Modal.svelte";
 	import ParticipantsSelect from "../../components/ParticipantsSelect.svelte";
@@ -33,18 +34,9 @@
 
 	onMount(async () => {
 		try {
-			// Fetch projects
-			let projectUrl = "http://localhost:8000/projects/";
-			let response = await fetch(projectUrl, {
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("session")}`,
-				},
-			});
-			projects = await response.json().then((data) => {
-				headers = Object.keys(data[0]);
-				console.log(data);
-				return data;
+			projects = await fetchData("projects").then((res) => {
+				headers = Object.keys(res[0]);
+				return res;
 			});
 		} catch (error) {
 			console.log(error);
@@ -82,31 +74,18 @@
 		}
 	}
 
-	function sendRequest(formData: FormData) {
+	async function sendRequest(formData: FormData) {
 		// Add the tags to formData
 		formData.set("tor", JSON.stringify(tags));
 
-		for (let [key, value] of formData.entries()) {
-			console.log(key, value);
-		}
+		// for (let [key, value] of formData.entries()) {
+		// 	console.log(key, value);
+		// }
 
-		let projectUrl = "http://localhost:8000/projects/";
-		fetch(projectUrl, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("session")}`,
-			},
-			body: formData,
-		})
-			.then((response) => {
-				console.log(response);
-				if (response.status === 200) {
-					window.location.reload();
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		await postData("projects", "", formData).then((res) => {
+			console.log(res);
+			showModal = false;
+		});
 	}
 
 	if (browser) {
