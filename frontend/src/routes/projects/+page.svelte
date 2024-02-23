@@ -78,11 +78,7 @@
 		// Add the tags to formData
 		formData.set("tor", JSON.stringify(tags));
 
-		// for (let [key, value] of formData.entries()) {
-		// 	console.log(key, value);
-		// }
-
-		await postData("projects", "", formData).then((res) => {
+		await postData("projects", "", JSON.stringify(Object.fromEntries(formData))).then((res) => {
 			console.log(res);
 			showModal = false;
 		});

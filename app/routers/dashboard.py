@@ -9,9 +9,7 @@ session_manager = service.SessionManager()
 @router.get("/")
 async def dashboard(userId: str = Depends(get_current_user)):
     # Active Project
-        # Project Participants
-    
-    active_project = Database().query(f"SELECT *, participants FROM projects WHERE status = 'active'")
+    active_project = Database().query(f"SELECT *, participants FROM projects WHERE status = 'active' ORDER BY id DESC LIMIT 1")
 
     for project in active_project:
         participants = json.loads(project['participants'])
@@ -23,6 +21,4 @@ async def dashboard(userId: str = Depends(get_current_user)):
     # All Projects
     all_projects = Database().query(f"SELECT * FROM projects")
 
-	# TODO: Limit active project to 1, and its attributes to 3 and show ... if more
-    # Espeically TOR
     return {"active_project": active_project, "new_experts": new_experts, "all_projects": all_projects}

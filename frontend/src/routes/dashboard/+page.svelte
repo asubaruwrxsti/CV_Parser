@@ -208,16 +208,29 @@
 															.join(" ")}
 													</span>
 													{#if isJson(item[key])}
-														{#each JSON.parse(item[key]) as jsonItem}
-															<div
-																class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
-															>
-																<span>
-																	{jsonItem.label ||
-																		jsonItem}
-																</span>
-															</div>
-														{/each}
+														<div
+															class="flex flex-wrap"
+														>
+															{#each JSON.parse(item[key]).slice(0, 3) as jsonItem}
+																<div
+																	class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+																>
+																	<span>
+																		{jsonItem.label ||
+																			jsonItem}
+																	</span>
+																</div>
+															{/each}
+															{#if JSON.parse(item[key]).length > 3}
+																<div
+																	class="tag mt-2 bg-teal-200 rounded px-3 py-1 text-sm text-blue-700 mr-2 mb-2 flex items-center inline-flex justify-start"
+																>
+																	<span
+																		>...</span
+																	>
+																</div>
+															{/if}
+														</div>
 													{:else}
 														<span
 															class="text-lg font-bold"

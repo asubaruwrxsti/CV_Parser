@@ -19,7 +19,7 @@ async def read(project_id: int):
 @router.post("/")
 async def create(request: Request):
     try:
-        form_data = await request.form()
+        form_data = await request.json()
         project_data = {field: form_data.get(field, None) for field in Project().fields}
 
         # Check if the image field is a base64 string
@@ -31,7 +31,11 @@ async def create(request: Request):
             else:
                 project_data['image'] = None
                 # return {"Error": "Image is not a base64 string"}
-
+        
+        if 'status' in project_data and project_data['status'] == 'active':
+			# Update all other projects to inactive
+            Database().query("UPDATE projects SET status = 'inactive' WHERE status = 'active'")
+            
         project = Project(**project_data)
         await project.create_record(Database())
         return {"Create": "project"}
