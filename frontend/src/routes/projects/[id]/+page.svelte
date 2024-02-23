@@ -208,6 +208,7 @@
 												JSON.stringify({
 													[key]: editedValue,
 												}),
+												"PUT",
 											)}
 									>
 										save

@@ -53,7 +53,7 @@
 			postData(
 				"projects",
 				data.projectID,
-				JSON.stringify({ [data.key]: selectedParticipants }),
+				JSON.stringify({ [data.key]: JSON.stringify(selectedParticipants) }),
 				"PUT"
 			);
 		}}
