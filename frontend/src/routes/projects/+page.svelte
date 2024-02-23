@@ -78,10 +78,18 @@
 		// Add the tags to formData
 		formData.set("tor", JSON.stringify(tags));
 
-		await postData("projects", "", JSON.stringify(Object.fromEntries(formData))).then((res) => {
-			console.log(res);
-			showModal = false;
-		});
+		for(let pair of formData.entries()) {
+			console.log(pair[0]+ ', '+ pair[1]);
+		}
+
+		// await postData(
+		// 	"projects",
+		// 	"",
+		// 	JSON.stringify(Object.fromEntries(formData)),
+		// ).then((res) => {
+		// 	console.log(res);
+		// 	showModal = false;
+		// });
 	}
 
 	if (browser) {
@@ -213,7 +221,11 @@
 			{#each headers as header}
 				{#if header !== "id"}
 					{#if header === "participants"}
-						<ParticipantsSelect {header} data={{ value: [] }} />
+						<ParticipantsSelect
+							{header}
+							data={{ key: "", projectID: 0, value: [] }}
+							showSaveButton={false}
+						/>
 					{:else if header === "image"}
 						<ImageEdit
 							{header}

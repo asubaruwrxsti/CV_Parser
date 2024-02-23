@@ -9,7 +9,7 @@
 	import { checkSession } from "../../../services/sessionManager";
 	import { parseJsonValues } from "../../../utils/utils";
 	import { fetchData, postData } from "../../../services/dataManager";
-	import type { ModalData } from "../../../interfaces/Interfaces";
+	import type { ModalData, EditType } from "../../../interfaces/Interfaces";
 
 	import { Body } from "svelte-body";
 
@@ -31,6 +31,7 @@
 	let modalData: ModalData = {
 		title: "",
 		body: {
+			projectID: 0,
 			key: "",
 			value: "",
 		},
@@ -43,10 +44,7 @@
 	// Editing
 	let editingKey: string | null = null;
 	let editedValue = "";
-	type EditType = {
-		title: string;
-		component: string;
-	};
+
 	$: rows = Math.ceil(editedValue.length / 80);
 
 	let components: { [key: string]: any } = {
@@ -57,13 +55,14 @@
 	};
 
 	const editTypes: Record<string, EditType> = {
-		tor: { title: "Terms of Reference", component: "TorEdit" },
+		tor: { title: "Terms of Reference", component: "TorEdit", key: "tor" },
 		participants: {
 			title: "Participants",
 			component: "ParticipantsSelect",
+			key: "participants",
 		},
-		image: { title: "Image", component: "ImageEdit" },
-		status: { title: "Status", component: "StatusEdit" },
+		image: { title: "Image", component: "ImageEdit", key: "image" },
+		status: { title: "Status", component: "StatusEdit", key: "status" },
 	};
 
 	function startEditing(key: string) {
@@ -79,6 +78,7 @@
 		modalData = {
 			title: editType.title,
 			body: {
+				projectID: data.props.data.id,
 				key,
 				value: project[key],
 			},
