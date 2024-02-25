@@ -1,9 +1,12 @@
 <script lang="ts">
+	import { postData } from "../services/dataManager";
 	import { createEventDispatcher } from "svelte";
 	const dispatch = createEventDispatcher();
 
 	export let header: string;
 	export let data: {
+		key: string;
+		projectID: number;
 		value: string[];
 	};
 	export let showSaveButton: boolean = false;
@@ -63,6 +66,14 @@
 {#if showSaveButton}
 	<button
 		class="mt-2 bg-teal-400 hover:bg-teal-700 text-white py-2 px-10 rounded text-xl transform transition duration-200 ease-in-out w-full"
+		on:click={() => {
+			postData(
+				"projects",
+				data.projectID,
+				JSON.stringify({ [data.key]: JSON.stringify(tags) }),
+				"PUT"
+			);
+		}}
 	>
 		Save
 	</button>

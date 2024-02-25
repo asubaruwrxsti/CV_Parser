@@ -82,14 +82,14 @@
 			console.log(pair[0]+ ', '+ pair[1]);
 		}
 
-		// await postData(
-		// 	"projects",
-		// 	"",
-		// 	JSON.stringify(Object.fromEntries(formData)),
-		// ).then((res) => {
-		// 	console.log(res);
-		// 	showModal = false;
-		// });
+		await postData(
+			"projects",
+			"",
+			JSON.stringify(Object.fromEntries(formData)),
+		).then((res) => {
+			console.log(res);
+			showModal = false;
+		});
 	}
 
 	if (browser) {
@@ -229,7 +229,7 @@
 					{:else if header === "image"}
 						<ImageEdit
 							{header}
-							data={{ projectID: "" }}
+							data={{ projectID: "", key: "image" }}
 							showSaveButton={false}
 						/>
 					{:else if header === "status"}
