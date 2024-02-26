@@ -1,7 +1,8 @@
 <script lang="ts">
 	/** @type {import('./$types').PageData} */
 	export let data: any;
-	console.log(data);
+	
+	// TODO: Add delete functionality
 
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
