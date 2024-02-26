@@ -229,7 +229,7 @@
 					{:else if header === "image"}
 						<ImageEdit
 							{header}
-							data={{ projectID: "", key: "image" }}
+							data={{ key: "image", projectID: "" }}
 							showSaveButton={false}
 						/>
 					{:else if header === "status"}
