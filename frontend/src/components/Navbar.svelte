@@ -7,6 +7,7 @@
     let isLoading = true;
 	let browserTheme = "";
 
+	// TODO: Replace with the generic fetch function
     onMount(async () => {
         let url = "http://localhost:8000/routing/routes";
         try {
@@ -48,6 +49,7 @@
                 alt="Flowbite Logo"
             />
         </NavBrand>
+		<!-- TODO: Update avatar with real data -->
 		<div class="flex items-center md:order-2">
 			<Avatar id="avatar-menu" src="/defaultavatar/Male-Default.png" />
 			<NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
