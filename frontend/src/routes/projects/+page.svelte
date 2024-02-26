@@ -13,6 +13,8 @@
 	import StatusEdit from "../../components/StatusEdit.svelte";
 	import ImageEdit from "../../components/ImageEdit.svelte";
 
+	// TODO: Add pagination to the projects page
+
 	// Loading state
 	let isLoading = true;
 
