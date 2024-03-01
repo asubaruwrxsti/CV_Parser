@@ -7,8 +7,9 @@ router = APIRouter(dependencies=[Depends(service.CORS), Depends(get_current_user
 applicants = Applicants()
 
 @router.get("/")
-async def read():    
-    return await applicants.get_records(Database())
+async def read():
+    applicantFields = [field for field in applicants.fields if field != 'cv_id']
+    return Database().query(f'SELECT {", ".join(applicantFields)} FROM applicants')
 
 @router.post("/search")
 async def search(request: Request):

@@ -2,12 +2,24 @@
 	export let property: string;
 
 	import { fetchData } from "../services/dataManager";
-	import { createTable, Render, Subscribe } from "svelte-headless-table";
+	import {
+		createTable,
+		Render,
+		Subscribe,
+		createRender,
+	} from "svelte-headless-table";
 	import { readable } from "svelte/store";
 	import * as Table from "$lib/components/ui/table";
+	import DataTableActions from "./DataTableActions.svelte";
+	import ArrowUpDown from "lucide-svelte/icons/arrow-up-down";
 
-	import { addPagination } from "svelte-headless-table/plugins";
+	import {
+		addPagination,
+		addSortBy,
+		addTableFilter,
+	} from "svelte-headless-table/plugins";
 	import { Button } from "$lib/components/ui/button";
+	import { Input } from "$lib/components/ui/input";
 
 	let data: any = [];
 	let headers: any = [];
@@ -19,6 +31,7 @@
 	let tableAttrs: any;
 	let tableBodyAttrs: any;
 	let pluginStates: any;
+	let filterValue: string;
 
 	let hasNextPage: boolean;
 	let hasPreviousPage: boolean;
@@ -27,27 +40,48 @@
 	async function loadData() {
 		data = await fetchData(property);
 		headers = Object.keys(data[0]);
+		headers.push(" ");
 		table = createTable(readable(data), {
 			page: addPagination(),
-		});
-		columns = table.createColumns(
-			Object.keys(data[0]).map((key) => {
-				return table.column({
-					accessor: key,
-					header: key,
-				});
+			sort: addSortBy(),
+			filter: addTableFilter({
+				fn: ({ filterValue, value }) =>
+					value.toLowerCase().includes(filterValue.toLowerCase()),
 			}),
-		);
+		});
+
+		function createColumn(key: string) {
+			return table.column({
+				accessor: key,
+				header: key.charAt(0).toUpperCase() + key.slice(1),
+				cell:
+					key === " "
+						? ({ value }) =>
+								createRender(DataTableActions, { id: value })
+						: undefined,
+			});
+		}
+
+		columns = table.createColumns(headers.map(createColumn));
 		({ headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
 			table.createViewModel(columns));
 
 		({ hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page);
+		filterValue = pluginStates.filter;
 	}
 
 	loadData();
 </script>
 
 {#if headerRows && pageRows}
+	<div class="flex items-center py-4">
+		<Input
+			class="max-w-sm"
+			placeholder="Filter emails..."
+			type="text"
+			bind:value={$filterValue}
+		/>
+	</div>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
@@ -59,9 +93,26 @@
 									attrs={cell.attrs()}
 									let:attrs
 									props={cell.props()}
+									let:props
 								>
-									<Table.Head>
-										<Render of={cell.render()} />
+									<Table.Head {...attrs}>
+										{#if cell.id === " "}
+											<div class="text-right">
+												<Render of={cell.render()} />
+											</div>
+										{:else if cell.id === "name"}
+											<Button
+												variant="ghost"
+												on:click={props.sort.toggle}
+											>
+												<Render of={cell.render()} />
+												<ArrowUpDown
+													class={"ml-2 h-4 w-4"}
+												/>
+											</Button>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
 									</Table.Head>
 								</Subscribe>
 							{/each}
@@ -76,7 +127,13 @@
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell>
-										<Render of={cell.render()} />
+										{#if cell.id === " "}
+											<div class="text-right">
+												<Render of={cell.render()} />
+											</div>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
 									</Table.Cell>
 								</Subscribe>
 							{/each}
