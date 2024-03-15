@@ -6,7 +6,6 @@
 	import { fetchData } from "../../services/dataManager";
 	import DataTable from "../../components/DataTable.svelte";
 
-
 	import Modal from "../../components/Modal.svelte";
 	import { Body } from "svelte-body";
 	$: bodyStyle = {
@@ -22,6 +21,7 @@
 	// Participants data
 	let participants: any = [];
 	let headers: any = [];
+	let dataLoaded = false;
 
 	onMount(async () => {
 		try {
@@ -29,6 +29,7 @@
 				headers = Object.keys(res[0]);
 				return res;
 			});
+			dataLoaded = true;
 		} catch (error) {
 			console.error(error);
 		}
@@ -77,7 +78,12 @@
 						New Participant
 					</button>
 				</div>
-				<DataTable property="participants" />
+                {#if dataLoaded}
+                    <DataTable
+                        data={participants}
+                        hideableCols={headers.slice(2)}
+                    />
+                {/if}
 			</div>
 		</div>
 	</div>

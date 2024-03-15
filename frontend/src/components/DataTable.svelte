@@ -1,170 +1,261 @@
 <script lang="ts">
-	export let property: string;
+	export let data: any[] = [];
+	export let hideableCols: string[] = [];
 
-	import { fetchData } from "../services/dataManager";
+	console.log("-----------------------------------");
+	console.log(data);
+	console.log(hideableCols);
+	console.log("-----------------------------------");
+
+	import CaretSort from "svelte-radix/CaretSort.svelte";
+	import ChevronDown from "svelte-radix/ChevronDown.svelte";
 	import {
 		createTable,
-		Render,
 		Subscribe,
+		Render,
 		createRender,
 	} from "svelte-headless-table";
-	import { readable } from "svelte/store";
-	import * as Table from "$lib/components/ui/table";
-	import DataTableActions from "./DataTableActions.svelte";
-	import ArrowUpDown from "lucide-svelte/icons/arrow-up-down";
-
 	import {
-		addPagination,
 		addSortBy,
+		addPagination,
 		addTableFilter,
+		addSelectedRows,
+		addHiddenColumns,
 	} from "svelte-headless-table/plugins";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
+	import { readable } from "svelte/store";
+	import * as Table from "$lib/components/ui/table/index.js";
+	import DataTableActions from "./DataTableActions.svelte";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+	import { cn } from "$lib/utils.js";
+	import { Input } from "$lib/components/ui/input/index.js";
+	import DataTableCheckbox from "./DataTableCheckbox.svelte";
 
-	let data: any = [];
-	let headers: any = [];
-	let table: any;
-	let columns: any;
+	let table = createTable(readable(data), {
+		sort: addSortBy({ disableMultiSort: true }),
+		page: addPagination(),
+		filter: addTableFilter({
+			fn: ({ filterValue, value }) => value.includes(filterValue),
+		}),
+		select: addSelectedRows(),
+		hide: addHiddenColumns(),
+	});
 
-	let headerRows: any;
-	let pageRows: any;
-	let tableAttrs: any;
-	let tableBodyAttrs: any;
-	let pluginStates: any;
-	let filterValue: any;
+	function createDynamicColumns(data: any) {
+		// Get the keys from the first object in the data array
+		let keys = Object.keys(data[0]);
 
-	let hasNextPage: any;
-	let hasPreviousPage: any;
-	let pageIndex: any;
-
-	async function loadData() {
-		data = await fetchData(property);
-		headers = Object.keys(data[0]);
-		headers.push(" ");
-		table = createTable(readable(data), {
-			page: addPagination(),
-			sort: addSortBy(),
-			filter: addTableFilter({
-				fn: ({ filterValue, value }) =>
-					value.toLowerCase().includes(filterValue.toLowerCase()),
-			}),
-		});
-
-		function createColumn(key: string) {
-			return table.column({
+		// Map over the keys to create column definitions
+		return keys.map((key) =>
+			table.column({
+				header: key,
 				accessor: key,
-				header: key.charAt(0).toUpperCase() + key.slice(1),
-				cell:
-					key === " "
-						? ({ value }) =>
-								createRender(DataTableActions, { id: value })
-						: undefined,
-			});
-		}
-
-		columns = table.createColumns(headers.map(createColumn));
-		({ headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
-			table.createViewModel(columns));
-
-		({ hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page);
-		filterValue = pluginStates.filter;
+				cell: ({ row }) => (row as any).original[key],
+				plugins: {
+					sort: {
+						disable: false,
+					},
+					filter: {
+						exclude: false,
+					},
+				},
+			}),
+		);
 	}
 
-	loadData();
+	// Existing columns
+	let existingColumns = [
+		table.column({
+			header: (_, { pluginStates }) => {
+				const { allPageRowsSelected } = pluginStates.select;
+				return createRender(DataTableCheckbox, {
+					checked: allPageRowsSelected,
+				});
+			},
+			accessor: "id",
+			cell: ({ row }, { pluginStates }) => {
+				const { getRowState } = pluginStates.select;
+				const { isSelected } = getRowState(row);
+
+				return createRender(DataTableCheckbox, {
+					checked: isSelected,
+				});
+			},
+			plugins: {
+				sort: {
+					disable: true,
+				},
+				filter: {
+					exclude: true,
+				},
+			},
+		}),
+		table.column({
+			header: "",
+			accessor: ({ id }) => id,
+			cell: (item) => {
+				return createRender(DataTableActions, { id: item.value });
+			},
+			plugins: {
+				sort: {
+					disable: true,
+				},
+			},
+		}),
+	];
+
+	// Combine existing columns with dynamically created columns
+	const columns = table.createColumns([
+		...createDynamicColumns(data),
+		...existingColumns,
+	]);
+
+	const {
+		headerRows,
+		pageRows,
+		tableAttrs,
+		tableBodyAttrs,
+		flatColumns,
+		pluginStates,
+		rows,
+	} = table.createViewModel(columns);
+
+	const { sortKeys } = pluginStates.sort;
+
+	const { hiddenColumnIds } = pluginStates.hide;
+	const ids = flatColumns.map((c) => c.id);
+	let hideForId = Object.fromEntries(ids.map((id) => [id, true]));
+
+	$: $hiddenColumnIds = Object.entries(hideForId)
+		.filter(([, hide]) => !hide)
+		.map(([id]) => id);
+
+	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+	const { filterValue } = pluginStates.filter;
+
+	const { selectedDataIds } = pluginStates.select;
 </script>
 
-{#if headerRows && pageRows}
-	<div>
-		<div class="flex items-center py-4">
-			<Input
-				class="max-w-sm"
-				placeholder="Filter emails..."
-				type="text"
-				bind:value={$filterValue}
-			/>
-		</div>
-		<div class="rounded-md border">
-			<Table.Root {...$tableAttrs}>
-				<Table.Header>
-					{#each $headerRows as headerRow}
-						<Subscribe rowAttrs={headerRow.attrs()}>
-							<Table.Row>
-								{#each headerRow.cells as cell (cell.id)}
-									<Subscribe
-										attrs={cell.attrs()}
-										let:attrs
-										props={cell.props()}
-										let:props
-									>
-										<Table.Head {...attrs}>
-											{#if cell.id === " "}
-												<div class="text-right">
-													<Render
-														of={cell.render()}
-													/>
-												</div>
-											{:else if cell.id === "name"}
-												<Button
-													variant="ghost"
-													on:click={props.sort.toggle}
-												>
-													<Render
-														of={cell.render()}
-													/>
-													<ArrowUpDown
-														class={"ml-2 h-4 w-4"}
-													/>
-												</Button>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
-										</Table.Head>
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						</Subscribe>
-					{/each}
-				</Table.Header>
-				<Table.Body {...$tableBodyAttrs}>
-					{#each $pageRows as row (row.id)}
-						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<Table.Row>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs>
-										<Table.Cell>
-											{#if cell.id === " "}
-												<div class="text-right">
-													<Render
-														of={cell.render()}
-													/>
-												</div>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
-										</Table.Cell>
-									</Subscribe>
-								{/each}
-							</Table.Row>
-						</Subscribe>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		</div>
-		<div class="flex items-center justify-end space-x-4 py-4">
-			<Button
-				variant="outline"
-				size="sm"
-				on:click={() => ($pageIndex = $pageIndex - 1)}
-				disabled={!$hasPreviousPage}>Previous</Button
-			>
-			<Button
-				variant="outline"
-				size="sm"
-				disabled={!$hasNextPage}
-				on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
-			>
-		</div>
+<div class="w-full">
+	<div class="mb-4 flex items-center gap-4">
+		<Input
+			class="max-w-sm"
+			placeholder="Filter emails..."
+			type="text"
+			bind:value={$filterValue}
+		/>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger asChild let:builder>
+				<Button variant="outline" class="ml-auto" builders={[builder]}>
+					Columns <ChevronDown class="ml-2 h-4 w-4" />
+				</Button>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content>
+				{#each flatColumns as col}
+					{#if hideableCols.includes(col.id)}
+						<DropdownMenu.CheckboxItem
+							bind:checked={hideForId[col.id]}
+						>
+							{col.header}
+						</DropdownMenu.CheckboxItem>
+					{/if}
+				{/each}
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
 	</div>
-{:else}
-	<p>Loading...</p>
-{/if}
+	<div class="rounded-md border">
+		<Table.Root {...$tableAttrs}>
+			<Table.Header>
+				{#each $headerRows as headerRow}
+					<Subscribe rowAttrs={headerRow.attrs()}>
+						<Table.Row>
+							{#each headerRow.cells as cell (cell.id)}
+								<Subscribe
+									attrs={cell.attrs()}
+									let:attrs
+									props={cell.props()}
+									let:props
+								>
+									<Table.Head
+										{...attrs}
+										class={cn(
+											"[&:has([role=checkbox])]:pl-3",
+										)}
+									>
+										{#if cell.id === "amount"}
+											<div class="text-right">
+												<Render of={cell.render()} />
+											</div>
+										{:else if cell.id === "email"}
+											<Button
+												variant="ghost"
+												on:click={props.sort.toggle}
+											>
+												<Render of={cell.render()} />
+												<CaretSort
+													class={cn(
+														$sortKeys[0]?.id ===
+															cell.id &&
+															"text-foreground",
+														"ml-2 h-4 w-4",
+													)}
+												/>
+											</Button>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
+									</Table.Head>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Header>
+			<Table.Body {...$tableBodyAttrs}>
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						<Table.Row
+							{...rowAttrs}
+							data-state={$selectedDataIds[row.id] && "selected"}
+						>
+							{#each row.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs>
+									<Table.Cell
+										class="[&:has([role=checkbox])]:pl-3"
+										{...attrs}
+									>
+										{#if cell.id === "amount"}
+											<div class="text-right font-medium">
+												<Render of={cell.render()} />
+											</div>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
+									</Table.Cell>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+	<div class="flex items-center justify-end space-x-2 py-4">
+		<div class="flex-1 text-sm text-muted-foreground">
+			{Object.keys($selectedDataIds).length} of{" "}
+			{$rows.length} row(s) selected.
+		</div>
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => ($pageIndex = $pageIndex - 1)}
+			disabled={!$hasPreviousPage}>Previous</Button
+		>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={!$hasNextPage}
+			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+		>
+	</div>
+</div>
